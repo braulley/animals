@@ -1,10 +1,10 @@
 import React from 'react';
 import { shallow } from 'enzyme';
-import Client from './Client';
+import Pets from './pets';
 
-describe('<Client />', () => {
+describe('<Pets />', () => {
   test('renders', () => {
-    const wrapper = shallow(<Client />);
+    const wrapper = shallow(<Pets />);
     expect(wrapper).toMatchSnapshot();
   });
 });

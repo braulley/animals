@@ -1,10 +1,10 @@
 import React from 'react';
 import { shallow } from 'enzyme';
-import NotFound from './notFound';
+import Users from './users';
 
-describe('<NotFound />', () => {
+describe('<Users />', () => {
   test('renders', () => {
-    const wrapper = shallow(<NotFound />);
+    const wrapper = shallow(<Users />);
     expect(wrapper).toMatchSnapshot();
   });
 });
