@@ -61,6 +61,7 @@ class Header extends React.Component {
   state = {
     client: true,
     pet: true,
+    veterinary_consultation: true,
   };
 
   handleClick(t, e) {
@@ -69,6 +70,9 @@ class Header extends React.Component {
     }
     if (t == 'pet') {
       this.setState(state => ({ pet: !state.pet }));
+    }
+    if(t == 'veterinary_consultation'){
+      this.setState(state => ({ veterinary_consultation: !state.veterinary_consultation}));
     }
   }
 
@@ -176,6 +180,34 @@ class Header extends React.Component {
                       <StarBorder />
                     </ListItemIcon>
                     <ListItemText inset primary="Lista de Usuários" />
+                  </ListItem>
+                </Link>
+              </List>
+            </Collapse>
+
+            <ListItem button onClick={(e) => this.handleClick('veterinary_consultation', e)}>
+              <ListItemIcon>
+                <InboxIcon />
+              </ListItemIcon>
+              <ListItemText inset primary="Consultas" />
+              {this.state.client ? <ExpandLess /> : <ExpandMore />}
+            </ListItem>
+            <Collapse in={this.state.client} timeout="auto" unmountOnExit>
+              <List component="div" disablePadding>
+                <Link to="/veterinary_consultation">
+                  <ListItem button className={classes.nested}>
+                    <ListItemIcon>
+                      <StarBorder />
+                    </ListItemIcon>
+                    <ListItemText inset primary="Registrar Consultas" />
+                  </ListItem>
+                </Link>
+                <Link to="/veterinary_consultations">
+                  <ListItem button className={classes.nested}>
+                    <ListItemIcon>
+                      <StarBorder />
+                    </ListItemIcon>
+                    <ListItemText inset primary="Lista de Consultas" />
                   </ListItem>
                 </Link>
               </List>

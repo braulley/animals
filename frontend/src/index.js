@@ -1,14 +1,16 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import * as serviceWorker from './serviceWorker';
+import React from 'react'
+import ReactDOM from 'react-dom'
+import './index.css'
+import App from './App'
+import * as serviceWorker from './serviceWorker'
 import Clients from './clients/clients' 
 import Client from './client/client'
 import Pets from './pets/pets'
 import Pet from './pet/pet'
 import Users from './users/users'
 import User from './user/user'
+import VeterinaryConsultations from './veterinary_consultations/veterinary_consultations'
+import VeterinaryConsultation from './veterinary_consultation'
 import { BrowserRouter, Switch, Route } from 'react-router-dom'
 
 ReactDOM.render(
@@ -21,6 +23,8 @@ ReactDOM.render(
             <Route path="/pet" component={Pet} />
             <Route path="/users" component={Users} />
             <Route path="/user" component={User} />
+            <Route path="/veterinary_consultation" component={VeterinaryConsultation} />
+            <Route path="/veterinary_consultations" component={VeterinaryConsultations} />
         </Switch>
     </ BrowserRouter>
     , document.getElementById('root'));
