@@ -59,9 +59,11 @@ function ListItemLink(props) {
 
 class Header extends React.Component {
   state = {
-    client: true,
-    pet: true,
-    veterinary_consultation: true,
+    client: false,
+    pet: false,
+    user: false,
+    veterinary_consultation: false,
+    product: false,
   };
 
   handleClick(t, e) {
@@ -71,8 +73,14 @@ class Header extends React.Component {
     if (t == 'pet') {
       this.setState(state => ({ pet: !state.pet }));
     }
-    if(t == 'veterinary_consultation'){
-      this.setState(state => ({ veterinary_consultation: !state.veterinary_consultation}));
+    if (t == 'user') {
+      this.setState(state => ({ user: !state.user }));
+    }
+    if (t == 'veterinary_consultation') {
+      this.setState(state => ({ veterinary_consultation: !state.veterinary_consultation }));
+    }
+    if (t == "product") {
+      this.setState(state => ({ product: !state.product }));
     }
   }
 
@@ -162,9 +170,9 @@ class Header extends React.Component {
                 <InboxIcon />
               </ListItemIcon>
               <ListItemText inset primary="Funcionários" />
-              {this.state.client ? <ExpandLess /> : <ExpandMore />}
+              {this.state.user ? <ExpandLess /> : <ExpandMore />}
             </ListItem>
-            <Collapse in={this.state.client} timeout="auto" unmountOnExit>
+            <Collapse in={this.state.user} timeout="auto" unmountOnExit>
               <List component="div" disablePadding>
                 <Link to="/user">
                   <ListItem button className={classes.nested}>
@@ -190,9 +198,9 @@ class Header extends React.Component {
                 <InboxIcon />
               </ListItemIcon>
               <ListItemText inset primary="Consultas" />
-              {this.state.client ? <ExpandLess /> : <ExpandMore />}
+              {this.state.veterinary_consultation ? <ExpandLess /> : <ExpandMore />}
             </ListItem>
-            <Collapse in={this.state.client} timeout="auto" unmountOnExit>
+            <Collapse in={this.state.veterinary_consultation} timeout="auto" unmountOnExit>
               <List component="div" disablePadding>
                 <Link to="/veterinary_consultation">
                   <ListItem button className={classes.nested}>
@@ -212,14 +220,47 @@ class Header extends React.Component {
                 </Link>
               </List>
             </Collapse>
+
+
+            <ListItem button onClick={(e) => this.handleClick('product', e)}>
+              <ListItemIcon>
+                <InboxIcon />
+              </ListItemIcon>
+              <ListItemText inset primary="Produtos" />
+              {this.state.product ? <ExpandLess /> : <ExpandMore />}
+            </ListItem>
+            <Collapse in={this.state.product} timeout="auto" unmountOnExit>
+              <List component="div" disablePadding>
+                <Link to="/product">
+                  <ListItem button className={classes.nested}>
+                    <ListItemIcon>
+                      <StarBorder />
+                    </ListItemIcon>
+                    <ListItemText inset primary="Cadastrar" />
+                  </ListItem>
+                </Link>
+
+                <Link to="/products">
+                  <ListItem button className={classes.nested}>
+                    <ListItemIcon>
+                      <StarBorder />
+                    </ListItemIcon>
+                    <ListItemText inset primary="Lista de Produtos" />
+                  </ListItem>
+                </Link>
+
+              </List>
+            </Collapse>
           </List>
+
+
           <Divider />
           <List component="nav">
-            <ListItem button>
-              <ListItemText primary="Trash" />
-            </ListItem>
-            <ListItemLink href="#simple-list">
-              <ListItemText primary="Spam" />
+            <ListItemLink href="/sales">
+              <ListItemText primary="Venda" />
+            </ListItemLink>
+            <ListItemLink href="/salesDone">
+              <ListItemText primary="Registro de Venda" />
             </ListItemLink>
           </List>
         </Drawer>

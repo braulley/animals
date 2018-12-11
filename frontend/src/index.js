@@ -11,6 +11,10 @@ import Users from './users/users'
 import User from './user/user'
 import VeterinaryConsultations from './veterinary_consultations/veterinary_consultations'
 import VeterinaryConsultation from './veterinary_consultation'
+import Products from './products/products'
+import Product from './product/product'
+import SalesDone from './salesDone/salesDone'
+import Sales from './sales/sales'
 import { BrowserRouter, Switch, Route } from 'react-router-dom'
 
 ReactDOM.render(
@@ -25,6 +29,10 @@ ReactDOM.render(
             <Route path="/user" component={User} />
             <Route path="/veterinary_consultation" component={VeterinaryConsultation} />
             <Route path="/veterinary_consultations" component={VeterinaryConsultations} />
+            <Route path="/products" component={Products} />
+            <Route path="/product" component={Product} />
+            <Route path="/salesDone" component={SalesDone} />
+            <Route path="/sales" component={Sales} />
         </Switch>
     </ BrowserRouter>
     , document.getElementById('root'));
