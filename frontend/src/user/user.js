@@ -25,9 +25,9 @@ import StepLabel from '@material-ui/core/StepLabel'
 import TextField from '@material-ui/core/TextField'
 import Divider from '@material-ui/core/Divider'
 import MaskedInput from 'react-text-mask'
-
-
-
+import Icon from '@material-ui/core/Icon'
+import SaveIcon from '@material-ui/icons/Save'
+import classNames from 'classnames'
 
 const styles = theme => ({
   root: {
@@ -84,6 +84,9 @@ const styles = theme => ({
       color: purple[500],
     },
   },
+  error: {
+    color: purple[500],
+  },
   cssFocused: {},
   cssUnderline: {
     '&:after': {
@@ -92,6 +95,12 @@ const styles = theme => ({
   },
   selectEmpty: {
     marginTop: theme.spacing.unit * 2,
+  },
+  rightIcon: {
+    marginLeft: theme.spacing.unit / 2,
+  },
+  button: {
+    margin: theme.spacing.unit,
   },
 });
 
@@ -174,7 +183,7 @@ function TextMaskEmail(props) {
     <MaskedInput
       {...other}
       ref={inputRef}
-      mask={[ /[A-Z]/, /\d/, '@', /\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
+      mask={[/[A-Z]/, /\d/, '@', /\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
       placeholderChar={'\u2000'}
       showMask
     />
@@ -192,6 +201,7 @@ class User extends React.Component {
       age: '',
       skipped: new Set(),
       error: true,
+      verifyCrmv: true,
       errorMessage: {
         name: '',
         registerCode: '',
@@ -258,29 +268,25 @@ class User extends React.Component {
     const contact = this.state.contact;
     contact[name] = event.target.value;
     this.setState({ contact: contact });
+    console.log(contact[name])
+
+    if (contact[name] === 3) {
+      this.setState({ verifyCrmv: false })
+    } else {
+      this.setState({ verifyCrmv: true })
+    }
+
+    this.validation()
   }
 
-  verifyCrmv () {
-    var obj = document.getElementById('office').value
-    alert(obj)
-    if(obj === 'Veterinário')
-      return true
-    return false
-  }
 
   validation() {
-
-
     if (this.state.contact.name === '') {
       this.state.errorMessage.name = '* Por favor, preencha o campo nome!'
       this.state.error = false
     }
     else if (this.state.contact.registerCode == '') {
       this.state.errorMessage.registerCode = '* CPF Inválido. '
-      this.state.error = false
-    }
-    else if (this.state.contact.nacionality == '') {
-      this.state.errorMessage.nacionality = '* Por favor preencher o campo nacionalidade.'
       this.state.error = false
     }
     else if (this.state.contact.sex == '') {
@@ -303,16 +309,14 @@ class User extends React.Component {
       this.state.errorMessage.phone1 = '* Preencha um valor válido.'
       this.state.error = false
     }
-    else if (this.state.contact.phone2 == '' || this.state.contact.phone2.length > 14) {
-      this.state.errorMessage.phone = '* Preencha um valor válido.'
-      this.state.error = false
-    }
     else if (this.state.address.zipCode == '' || this.state.address.zipCode.length != 9) {
       this.state.errorMessage.zipCode = '* Preencha o CEP.'
       this.state.error = false
     }
     else if (this.state.contact.office == '') {
       this.state.errorMessage.zipCode = '* Preencha o Cargo correto.'
+      this.state.error = false
+    } else if (this.state.contact.salary <= 0) {
       this.state.error = false
     } else {
       this.state.error = true
@@ -363,7 +367,12 @@ class User extends React.Component {
                   value={this.state.contact.name}
                   onChange={this.handleChange('name')}
                   id="name"
+                  required
                 />
+                {this.state.contact.name === '' &&
+                  <span className={classes.error} >Here</span>
+
+                }
               </Grid>
               <Grid item xs={4}>
                 <TextField
@@ -372,8 +381,21 @@ class User extends React.Component {
                   value={this.state.contact.userName}
                   onChange={this.handleChange('userName')}
                   id="userName"
+                  required
                 />
               </Grid>
+
+              <Grid item xs={4}>
+                <TextField
+                  className={classes.containerInput}
+                  label="CPF"
+                  value={this.state.contact.registerCode}
+                  onChange={this.handleChange('registerCode')}
+                  id="registerCode"
+                  required
+                />
+              </Grid>
+
               <Grid item xs={3}>
                 <TextField
                   className={classes.containerInput}
@@ -382,6 +404,7 @@ class User extends React.Component {
                   onChange={this.handleChange('dateBirth')}
                   id="dateBirth"
                   type="date"
+                  required
                   defaultValue="2017-05-24"
                   InputLabelProps={{
                     shrink: true,
@@ -400,11 +423,13 @@ class User extends React.Component {
                   id="email"
                 />
               </Grid>
+
               <Grid item xs={4}>
                 <TextField
                   id="sex"
                   select
                   label="Sexo"
+                  required
                   className={classes.containerInput}
                   value={this.state.contact.sex}
                   onChange={this.handleChange('sex')}
@@ -417,6 +442,7 @@ class User extends React.Component {
                   ))}
                 </TextField>
               </Grid>
+
               <Grid item xs={4}>
                 <TextField
                   className={classes.containerInput}
@@ -443,23 +469,11 @@ class User extends React.Component {
                 />
               </Grid>
 
-              <Grid item xs={4}>
-                <TextField
-                  className={classes.containerInput}
-                  label="Telefone Comercial"
-                  value={this.state.contact.phone2}
-                  onChange={this.handleChange('phone2')}
-                  id="phone2"
-                  InputProps={{
-                    inputComponent: TextMaskCustom,
-                  }}
-                />
-              </Grid>
-
               <Grid item xs={3}>
                 <TextField
                   className={classes.containerInput}
                   label="Salário"
+                  required
                   value={this.state.contact.salary}
                   onChange={this.handleChange('salary')}
                   id="salary"
@@ -486,6 +500,7 @@ class User extends React.Component {
                   id="office"
                   select
                   label="Cargo"
+                  required
                   className={classes.containerInput}
                   value={this.state.contact.office}
                   onChange={this.handleChange('office')}
@@ -504,17 +519,113 @@ class User extends React.Component {
                   ))}
                 </TextField>
               </Grid>
-                <Grid item xs={3} >
-                  <TextField
-                    id="crmv"
-                    label="CRMV"
-                    disabled={this.verifyCrmv}
-                    className={classes.containerInput}
-                    value={this.state.contact.crmv}
-                    onChange={this.handleChange('crmv')}
+              <Grid item xs={3} >
+                <TextField
+                  id="crmv"
+                  label="CRMV"
+                  disabled={this.state.verifyCrmv}
+                  className={classes.containerInput}
+                  value={this.state.contact.crmv}
+                  onChange={this.handleChange('crmv')}
 
-                  />
-                </Grid>
+                />
+              </Grid>
+
+              <Grid item xs={3} >
+                <TextField
+                  id="zipCode"
+                  label="CEP"
+                  required
+                  className={classes.containerInput}
+                  value={this.state.address.zipCode}
+                  onChange={this.handleChangeAddress('zipCode')}
+                />
+              </Grid>
+
+              <Grid item xs={9} >
+                <TextField
+                  id="street"
+                  label="Logradouro"
+                  className={classes.containerInput}
+                  value={this.state.address.street}
+                  onChange={this.handleChangeAddress('street')}
+                />
+              </Grid>
+
+              <Grid item xs={3} >
+                <TextField
+                  id="number"
+                  type="number"
+                  label="Número"
+                  className={classes.containerInput}
+                  value={this.state.address.number}
+                  onChange={this.handleChangeAddress('number')}
+                />
+              </Grid>
+
+              <Grid item xs={3} >
+                <TextField
+                  id="complement"
+                  label="Complemento"
+                  className={classes.containerInput}
+                  value={this.state.address.complement}
+                  onChange={this.handleChangeAddress('complement')}
+                />
+              </Grid>
+
+              <Grid item xs={6} >
+                <TextField
+                  id="neighborhood"
+                  label="Neighborhood"
+                  className={classes.containerInput}
+                  value={this.state.address.neighborhood}
+                  onChange={this.handleChangeAddress('neighborhood')}
+                />
+              </Grid>
+
+              <Grid item xs={4} >
+                <TextField
+                  id="city"
+                  label="Cidade"
+                  className={classes.containerInput}
+                  value={this.state.address.city}
+                  onChange={this.handleChangeAddress('city')}
+                />
+              </Grid>
+
+              <Grid item xs={4} >
+                <TextField
+                  id="state"
+                  label="Estado"
+                  className={classes.containerInput}
+                  value={this.state.address.states}
+                  onChange={this.handleChangeAddress('states')}
+                />
+              </Grid>
+
+
+              <Grid item xs={4} >
+                <TextField
+                  id="country"
+                  label="País"
+                  className={classes.containerInput}
+                  value={this.state.address.country}
+                  onChange={this.handleChangeAddress('country')}
+                />
+              </Grid>
+
+              <Grid item xs={9}></Grid>
+              <Grid item xs={3}>
+                <Button variant="contained" color="primary" 
+                className={classes.button} 
+                disabled={this.state.error}
+                type="submit"
+                >
+                  Salvar
+        {/* This Button uses a Font Icon, see the installation instructions in the docs. */}
+                  <SaveIcon className={classNames(classes.rightIcon)} />
+                </Button>
+              </Grid>
             </Grid>
           </form>
 
