@@ -14,6 +14,7 @@ import CardActionArea from '@material-ui/core/CardActionArea'
 import CardActions from '@material-ui/core/CardActions'
 import CardContent from '@material-ui/core/CardContent'
 import CardMedia from '@material-ui/core/CardMedia'
+import NumberFormat from 'react-number-format'
 import MenuItem from '@material-ui/core/MenuItem'
 import Select from '@material-ui/core/Select'
 import InputLabel from '@material-ui/core/InputLabel'
@@ -21,8 +22,10 @@ import FormControl from '@material-ui/core/FormControl'
 import purple from '@material-ui/core/colors/purple'
 import FormHelperText from '@material-ui/core/FormHelperText'
 import StepLabel from '@material-ui/core/StepLabel'
-import { Field, reduxForm } from 'redux-form'
 import TextField from '@material-ui/core/TextField'
+import Divider from '@material-ui/core/Divider'
+import MaskedInput from 'react-text-mask'
+
 
 
 
@@ -92,62 +95,91 @@ const styles = theme => ({
   },
 });
 
-function getSteps() {
-  return ['Dados Pessoais', 'Contato', 'Endereço', 'Tipo Colaborador', 'Finalizar'];
-}
+const selectSex = [
+  {
+    value: 0,
+    label: '',
+  },
+  {
+    value: 1,
+    label: 'Feminino',
+  },
+  {
+    value: 2,
+    label: 'Masculino',
+  },
+];
 
-function getStepContent(step) {
-  switch (step) {
-    case 0:
-      return 'Step 1: Select campaign settings...';
-    case 1:
-      return 'Step 2: What is an ad group anyways?';
-    case 2:
-      return 'Step 3: This is the bit I really care about!';
-    case 3:
-      return 'Step 3: This is the bit I really care about!';
-    case 4:
-      return 'Step 4: FInally';
-    default:
-      return 'Unknown step';
+const officer = [
+  {
+    value: 0,
+    label: '',
+  },
+  {
+    value: 1,
+    label: 'Atendente',
+  },
+  {
+    value: 2,
+    label: 'Vendedor',
+  },
+  {
+    value: 3,
+    label: 'Veterinário',
+  },
+  {
+    value: 4,
+    label: 'Administrador',
   }
+]
+
+function NumberFormatCustom(props) {
+  const { inputRef, onChange, ...other } = props;
+
+  return (
+    <NumberFormat
+      {...other}
+      getInputRef={inputRef}
+      onValueChange={values => {
+        onChange({
+          target: {
+            value: values.value,
+          },
+        });
+      }}
+      thousandSeparator
+      prefix="R$"
+    />
+  );
 }
 
-const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
+function TextMaskCustom(props) {
+  const { inputRef, ...other } = props;
 
-const asyncValidate = (values /*, dispatch */) => {
-  return sleep(1000).then(() => {
-    // simulate server latency
-    if (['foo@foo.com', 'bar@bar.com'].includes(values.email)) {
-      // eslint-disable-next-line no-throw-literal
-      throw { email: 'Email already Exists' }
-    }
-  })
+  return (
+    <MaskedInput
+      {...other}
+      ref={inputRef}
+      mask={['(', /[1-9]/, /\d/, ')', ' ', /\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
+      placeholderChar={'\u2000'}
+      showMask
+    />
+  );
 }
 
-const validate = values => {
-  const errors = {}
-  const requiredFields = [
-    'firstName',
-    'lastName',
-    'email',
-    'favoriteColor',
-    'notes'
-  ]
-  requiredFields.forEach(field => {
-    if (!values[field]) {
-      errors[field] = 'Required'
-    }
-  })
-  if (
-    values.email &&
-    !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)
-  ) {
-    errors.email = 'Invalid email address'
-  }
-  return errors
-}
+function TextMaskEmail(props) {
+  const { inputRef, ...other } = props;
 
+  return (
+    <MaskedInput
+      {...other}
+      ref={inputRef}
+      mask={[ /[A-Z]/, /\d/, '@', /\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
+      placeholderChar={'\u2000'}
+      showMask
+    />
+  );
+}
 
 class User extends React.Component {
 
@@ -159,6 +191,32 @@ class User extends React.Component {
       step: 1,
       age: '',
       skipped: new Set(),
+      error: true,
+      errorMessage: {
+        name: '',
+        registerCode: '',
+        dateBIrth: '',
+        nacionality: '',
+        dateBirth: Date(),
+        maritalStatus: '',
+        sex: '',
+        office: '',
+        crmv: '',
+        comission: 0,
+        salary: 0.00,
+        email: '',
+        phone: '',
+        phone1: '',
+        phone2: '',
+        street: '',
+        zipCode: '',
+        number: 0,
+        complement: '',
+        neighborhood: '',
+        city: '',
+        states: '',
+        country: '',
+      },
       contact: {
         name: '',
         registerCode: '',
@@ -174,6 +232,7 @@ class User extends React.Component {
         phone: '',
         phone1: '',
         phone2: '',
+        userName: '',
       },
       address: {
         street: '',
@@ -191,60 +250,73 @@ class User extends React.Component {
   }
 
 
-  totalSteps = () => {
-    return getSteps().length;
-  };
 
-  handleNext = () => {
-    this.setState(state => ({
-      activeStep: state.activeStep + 1,
-    }));
-  };
-
-  handleBack = () => {
-    this.setState(state => ({
-      activeStep: state.activeStep - 1,
-    }));
-  };
-
-  handleStep = step => () => {
-    this.setState({
-      activeStep: step,
-    });
-  };
-
-  handleComplete = () => {
-    const { completed } = this.state;
-    completed[this.state.activeStep] = true;
-    this.setState({
-      completed,
-    });
-    this.handleNext();
-  };
-
-  handleReset = () => {
-    this.setState({
-      activeStep: 0,
-    });
-  };
-
-  completedSteps() {
-    return Object.keys(this.state.completed).length;
-  }
-
-  isLastStep() {
-    return this.state.activeStep === this.totalSteps() - 1;
-  }
-
-  allStepsCompleted() {
-    return this.completedSteps() === this.totalSteps();
-  }
 
 
   handleChange = name => event => {
+
     const contact = this.state.contact;
     contact[name] = event.target.value;
     this.setState({ contact: contact });
+  }
+
+  verifyCrmv () {
+    var obj = document.getElementById('office').value
+    alert(obj)
+    if(obj === 'Veterinário')
+      return true
+    return false
+  }
+
+  validation() {
+
+
+    if (this.state.contact.name === '') {
+      this.state.errorMessage.name = '* Por favor, preencha o campo nome!'
+      this.state.error = false
+    }
+    else if (this.state.contact.registerCode == '') {
+      this.state.errorMessage.registerCode = '* CPF Inválido. '
+      this.state.error = false
+    }
+    else if (this.state.contact.nacionality == '') {
+      this.state.errorMessage.nacionality = '* Por favor preencher o campo nacionalidade.'
+      this.state.error = false
+    }
+    else if (this.state.contact.sex == '') {
+      this.state.errorMessage.sex = '* Por favor, preencha o campo sexo.'
+      this.state.error = false
+    }
+    else if (this.state.contact.comission < 0) {
+      this.state.errorMessage.comission = '* Preencha um valor válido.'
+      this.state.error = false
+    }
+    else if (this.state.contact.salary < 0) {
+      this.state.errorMessage.salary = '* Preencha um valor válido.'
+      this.state.error = false
+    }
+    else if (this.state.contact.phone == '' || this.state.contact.phone.length != 14) {
+      this.state.errorMessage.phone = '* Preencha um valor válido.'
+      this.state.error = false
+    }
+    else if (this.state.contact.phone1 == '' || this.state.contact.phone1.length != 13) {
+      this.state.errorMessage.phone1 = '* Preencha um valor válido.'
+      this.state.error = false
+    }
+    else if (this.state.contact.phone2 == '' || this.state.contact.phone2.length > 14) {
+      this.state.errorMessage.phone = '* Preencha um valor válido.'
+      this.state.error = false
+    }
+    else if (this.state.address.zipCode == '' || this.state.address.zipCode.length != 9) {
+      this.state.errorMessage.zipCode = '* Preencha o CEP.'
+      this.state.error = false
+    }
+    else if (this.state.contact.office == '') {
+      this.state.errorMessage.zipCode = '* Preencha o Cargo correto.'
+      this.state.error = false
+    } else {
+      this.state.error = true
+    }
   }
 
   handleChangeAddress = propertyName => event => {
@@ -269,7 +341,6 @@ class User extends React.Component {
 
   render() {
     const { classes } = this.props;
-    const steps = getSteps();
     const { activeStep } = this.state;
 
 
@@ -278,599 +349,175 @@ class User extends React.Component {
         <Header />
         <main className={classes.content}>
           <div className={classes.toolbar} />
-          <Grid container spacing={24}>
-            <form ref="form" className={classes.root} autoComplete="off" onSubmit={this.handleSubmit}>
+          <form ref="form" className={classes.root} noValidate autoComplete="off" onSubmit={this.handleSubmit}>
 
+            <Grid container spacing={24}>
               <Grid item xs={12}>
-                <div className={classes.root}>
-                  <Stepper activeStep={activeStep} alternativeLabel>
-                    {steps.map(label => {
-                      return (
-                        <Step key={label}>
-                          <StepLabel>{label}</StepLabel>
-                        </Step>
-                      );
-                    })}
-                  </Stepper>
-                  <div>
-
-                    <div >
-                      {this.state.activeStep === 0 && <div className={classes.rootLayout}>
-                        <Grid container spacing={24}>
-
-                          <Grid item xs={12} >
-                            <FormControl className={classes.containerInput} >
-                              <InputLabel
-                                htmlFor="custom-css-standard-input"
-                                classes={{
-                                  root: classes.cssLabel,
-                                  focused: classes.cssFocused,
-                                }}
-                              >
-                                Nome
-                                  </InputLabel>
-                              <Input
-                                id="name"
-                                value={this.state.contact.name} 
-                                onChange={this.handleChange('name')}
-                                classes={{
-                                  underline: classes.cssUnderline,
-                                }}
-                              />
-                            </FormControl>
-                          </Grid>
-                          <Grid item xs={6} >
-                            <FormControl className={classes.containerInput}>
-                              <InputLabel
-                                htmlFor="custom-css-standard-input"
-                                classes={{
-                                  root: classes.cssLabel,
-                                  focused: classes.cssFocused,
-                                }}
-                              >
-                                CPF
-                                  </InputLabel>
-                              <Input
-                                id="cpf"
-                                value={this.state.contact.registerCode} 
-                                onChange={this.handleChange('registerCode')}
-                                classes={{
-                                  underline: classes.cssUnderline,
-                                }}
-                              />
-                            </FormControl>
-                          </Grid>
-
-                          <Grid item xs={6} >
-                            <FormControl className={classes.containerInput}>
-                              <InputLabel
-                                htmlFor="custom-css-standard-input"
-                                classes={{
-                                  root: classes.cssLabel,
-                                  focused: classes.cssFocused,
-                                }}
-                              >
-                                Nacionalidade
-                                  </InputLabel>
-                              <Input
-                                id="nac"
-                                value={this.state.contact.nacionality} 
-                                onChange={this.handleChange('nacionality')}
-                                classes={{
-                                  underline: classes.cssUnderline,
-                                }}
-                              />
-                            </FormControl>
-                          </Grid>
-
-                          <Grid item xs={4} >
-                            <FormControl className={classes.containerInput}>
-                              <InputLabel
-                                htmlFor="custom-css-standard-input"
-                                classes={{
-                                  root: classes.cssLabel,
-                                  focused: classes.cssFocused,
-                                }}
-                              >
-                                Data de Nascimento
-                                  </InputLabel>
-                              <Input
-                                id="date"
-                                type="date"
-                                value={this.state.contact.dateBirth} 
-                                onChange={this.handleChange('dateBirth')}
-                                classes={{
-                                  underline: classes.cssUnderline,
-                                }}
-                              />
-                            </FormControl>
-                          </Grid>
-
-                          <Grid item xs={4} >
-                            <FormControl className={classes.containerInput}>
-                              <InputLabel htmlFor="age-required">Estado Civil</InputLabel>
-                              <Select
-                                value={this.state.contact.maritalStatus}
-                                onChange={this.handleChange('maritalStatus')}
-                                name="age"
-                                inputProps={{
-                                  id: 'age-required',
-                                }}
-                              >
-                                <MenuItem value="">
-                                  <em>None</em>
-                                </MenuItem>
-                                <MenuItem value={1}>Solteirx</MenuItem>
-                                <MenuItem value={2}>Casadx</MenuItem>
-                                <MenuItem value={3}>Divorciadx</MenuItem>
-                                <MenuItem value={4}>Amigadx</MenuItem>
-                              </Select>
-                              <FormHelperText>Required</FormHelperText>
-                            </FormControl>
-                          </Grid>
-
-                          <Grid item xs={4} >
-                            <FormControl className={classes.containerInput}>
-                              <InputLabel htmlFor="age-required">Sexo</InputLabel>
-                              <Select
-                                value={this.state.contact.sex}
-                                onChange={this.handleChange('sex')}
-                                name="age"
-                                inputProps={{
-                                  id: 'age-required',
-                                }}
-                              >
-                                <MenuItem value="">
-                                  <em>None</em>
-                                </MenuItem>
-                                <MenuItem value={10}>Masculino</MenuItem>
-                                <MenuItem value={20}>Feminino</MenuItem>
-                              </Select>
-                              <FormHelperText>Required</FormHelperText>
-                            </FormControl>
-                          </Grid>
-                        </Grid>
-                      </div>}
-
-                      {this.state.activeStep === 3 && <div className={classes.rootLayout}>
-                        <Grid container spacing={24}>
-
-                          <Grid item xs={6} >
-                            <FormControl className={classes.containerInput}>
-                              <InputLabel
-                                htmlFor="custom-css-standard-input"
-                                classes={{
-                                  root: classes.cssLabel,
-                                  focused: classes.cssFocused,
-                                }}
-                              >
-                                Cargo
-                                  </InputLabel>
-                              <Input
-                                id="office"
-                                value={this.state.contact.office}
-                                onChange={this.handleChange('office')}
-                                classes={{
-                                  underline: classes.cssUnderline,
-                                }}
-                              />
-                            </FormControl>
-                          </Grid>
-                          <Grid item xs={6} >
-                            <FormControl className={classes.containerInput}>
-                              <InputLabel
-                                htmlFor="custom-css-standard-input"
-                                classes={{
-                                  root: classes.cssLabel,
-                                  focused: classes.cssFocused,
-                                }}
-                              >
-                                CRMV
-                                  </InputLabel>
-                              <Input
-                                id="crmv"                        
-                                value={this.state.contact.crmv}
-                                onChange={this.handleChange('crmv')}
-                                classes={{
-                                  underline: classes.cssUnderline,
-                                }}
-                              />
-                            </FormControl>
-                          </Grid>
-
-                          <Grid item xs={6} >
-                            <FormControl className={classes.containerInput}>
-                              <InputLabel
-                                htmlFor="custom-css-standard-input"
-                                classes={{
-                                  root: classes.cssLabel,
-                                  focused: classes.cssFocused,
-                                }}
-                              >
-                                Comissão
-                                  </InputLabel>
-                              <Input
-                                id="custom-css-standard-input"
-                                type="number"
-                                value={this.state.contact.comission}
-                                onChange={this.handleChange('comission')}
-                                classes={{
-                                  underline: classes.cssUnderline,
-                                }}
-                              />
-                            </FormControl>
-                          </Grid>
-
-                          <Grid item xs={6} >
-                            <FormControl className={classes.containerInput}>
-                              <InputLabel
-                                htmlFor="custom-css-standard-input"
-                                classes={{
-                                  root: classes.cssLabel,
-                                  focused: classes.cssFocused,
-                                }}
-                              >
-                                Salário
-                                  </InputLabel>
-                              <Input
-                                id="salary"
-                                type="number"
-                                value={this.state.contact.salary}
-                                onChange={this.handleChange('salary')}
-                                classes={{
-                                  underline: classes.cssUnderline,
-                                }}
-                              />
-                            </FormControl>
-                          </Grid>
-                        </Grid>
-                      </div>}
-
-                      {this.state.activeStep === 2 && <div className={classes.rootLayout}>
-                        <Grid container spacing={24}>
-
-                          <Grid item xs={12} >
-                            <FormControl className={classes.containerInput}>
-                              <InputLabel
-                                htmlFor="custom-css-standard-input"
-                                classes={{
-                                  root: classes.cssLabel,
-                                  focused: classes.cssFocused,
-                                }}
-                              >
-                                Logradouro
-                                  </InputLabel>
-                              <Input
-                                id="street"
-                                value={this.state.address.street}
-                                onChange={this.handleChangeAddress('street')}
-                                classes={{
-                                  underline: classes.cssUnderline,
-                                }}
-                              />
-                            </FormControl>
-                          </Grid>
-
-                          <Grid item xs={4} >
-                            <FormControl className={classes.containerInput}>
-                              <InputLabel
-                                htmlFor="custom-css-standard-input"
-                                classes={{
-                                  root: classes.cssLabel,
-                                  focused: classes.cssFocused,
-                                }}
-                              >
-                                CEP
-                                  </InputLabel>
-                              <Input
-                                id="zipCode"
-                                value={this.state.address.zipCode}
-                                onChange={this.handleChangeAddress('zipCode')}
-                                classes={{
-                                  underline: classes.cssUnderline,
-                                }}
-                              />
-                            </FormControl>
-                          </Grid>
-
-                          <Grid item xs={4} >
-                            <FormControl className={classes.containerInput}>
-                              <InputLabel
-                                htmlFor="custom-css-standard-input"
-                                classes={{
-                                  root: classes.cssLabel,
-                                  focused: classes.cssFocused,
-                                }}
-                              >
-                                Número
-                                  </InputLabel>
-                              <Input
-                                id="number"
-                                type="number"
-                                value={this.state.address.number}
-                                onChange={this.handleChangeAddress('number')}
-                                classes={{
-                                  underline: classes.cssUnderline,
-                                }}
-                              />
-                            </FormControl>
-                          </Grid>
-
-                          <Grid item xs={4} >
-                            <FormControl className={classes.containerInput}>
-                              <InputLabel
-                                htmlFor="custom-css-standard-input"
-                                classes={{
-                                  root: classes.cssLabel,
-                                  focused: classes.cssFocused,
-                                }}
-                              >
-                                Complemento
-                                  </InputLabel>
-                              <Input
-                                id="complement"
-                                value={this.state.address.complement}
-                                onChange={this.handleChangeAddress('complement')}
-                                classes={{
-                                  underline: classes.cssUnderline,
-                                }}
-                              />
-                            </FormControl>
-                          </Grid>
-
-                          <Grid item xs={6} >
-                            <FormControl className={classes.containerInput}>
-                              <InputLabel
-                                htmlFor="custom-css-standard-input"
-                                classes={{
-                                  root: classes.cssLabel,
-                                  focused: classes.cssFocused,
-                                }}
-                              >
-                                Bairro
-                                  </InputLabel>
-                              <Input
-                                id="neighborhood"
-                                value={this.state.address.neighborhood}
-                                onChange={this.handleChangeAddress('neighborhood')}
-                                classes={{
-                                  underline: classes.cssUnderline,
-                                }}
-                              />
-                            </FormControl>
-                          </Grid>
-
-                          <Grid item xs={6} >
-                            <FormControl className={classes.containerInput}>
-                              <InputLabel
-                                htmlFor="custom-css-standard-input"
-                                classes={{
-                                  root: classes.cssLabel,
-                                  focused: classes.cssFocused,
-                                }}
-                              >
-                                Cidade
-                                  </InputLabel>
-                              <Input
-                                id="city"
-                                value={this.state.address.city}
-                                onChange={this.handleChangeAddress('city')}
-                                classes={{
-                                  underline: classes.cssUnderline,
-                                }}
-                              />
-                            </FormControl>
-                          </Grid>
-
-                          <Grid item xs={6} >
-                            <FormControl className={classes.containerInput}>
-                              <InputLabel
-                                htmlFor="custom-css-standard-input"
-                                classes={{
-                                  root: classes.cssLabel,
-                                  focused: classes.cssFocused,
-                                }}
-                              >
-                                Estado
-                                  </InputLabel>
-                              <Input
-                                id="state"
-                                value={this.state.address.states}
-                                onChange={this.handleChangeAddress('state')}
-                                classes={{
-                                  underline: classes.cssUnderline,
-                                }}
-                              />
-                            </FormControl>
-                          </Grid>
-
-                          <Grid item xs={6} >
-                            <FormControl className={classes.containerInput}>
-                              <InputLabel
-                                htmlFor="custom-css-standard-input"
-                                classes={{
-                                  root: classes.cssLabel,
-                                  focused: classes.cssFocused,
-                                }}
-                              >
-                                País
-                                  </InputLabel>
-                              <Input
-                                id="country"
-                                value={this.state.address.country}
-                                onChange={this.handleChangeAddress('country')}
-                                classes={{
-                                  underline: classes.cssUnderline,
-                                }}
-                              />
-                            </FormControl>
-                          </Grid>
-                        </Grid>
-                      </div>}
-
-                      {this.state.activeStep === 1 && <div className={classes.rootLayout}>
-                        <Grid container spacing={24}>
-
-                          <Grid item xs={6} >
-                            <FormControl className={classes.containerInput}>
-                              <InputLabel
-                                htmlFor="custom-css-standard-input"
-                                classes={{
-                                  root: classes.cssLabel,
-                                  focused: classes.cssFocused,
-                                }}
-                              >
-                                Email
-                                  </InputLabel>
-                              <Input
-                                id="email"
-                                type="email"
-                                value={this.state.contact.email}
-                                onChange={this.handleChange('email')}
-                                classes={{
-                                  underline: classes.cssUnderline,
-                                }}
-                              />
-                            </FormControl>
-                          </Grid>
-                          <Grid item xs={6} >
-                            <FormControl className={classes.containerInput}>
-                              <InputLabel
-                                htmlFor="custom-css-standard-input"
-                                classes={{
-                                  root: classes.cssLabel,
-                                  focused: classes.cssFocused,
-                                }}
-                              >
-                                Celular I
-                                  </InputLabel>
-                              <Input
-                                id="phone"
-                                value={this.state.contact.phone}
-                                onChange={this.handleChange('phone')}
-                                classes={{
-                                  underline: classes.cssUnderline,
-                                }}
-                              />
-                            </FormControl>
-                          </Grid>
-
-                          <Grid item xs={6} >
-                            <FormControl className={classes.containerInput}>
-                              <InputLabel
-                                htmlFor="custom-css-standard-input"
-                                classes={{
-                                  root: classes.cssLabel,
-                                  focused: classes.cssFocused,
-                                }}
-                              >
-                                Telefone Comercial
-                                  </InputLabel>
-                              <Input
-                                id="phone1"
-                                value={this.state.contact.phone1}
-                                onChange={this.handleChange('phone1')}
-                                classes={{
-                                  underline: classes.cssUnderline,
-                                }}
-                              />
-                            </FormControl>
-                          </Grid>
-
-                          <Grid item xs={6} >
-                            <FormControl className={classes.containerInput}>
-                              <InputLabel
-                                htmlFor="custom-css-standard-input"
-                                classes={{
-                                  root: classes.cssLabel,
-                                  focused: classes.cssFocused,
-                                }}
-                              >
-                                Telefone Residencial
-                                  </InputLabel>
-                              <Input
-                                id="phone2"
-                                value={this.state.contact.phone2}
-                                onChange={this.handleChange('phone2')}
-                                classes={{
-                                  underline: classes.cssUnderline,
-                                }}
-                              />
-                            </FormControl>
-                          </Grid>
-                        </Grid>
-                      </div>}
-
-                      {this.state.activeStep === 4 && <div className={classes.rootLayout}>
-                        <Card className={classes.card}>
-                          <CardActionArea>
-                            <CardMedia
-                              className={classes.media}
-                              image="/static/images/cards/contemplative-reptile.jpg"
-                              title="Contemplative Reptile"
-                            />
-                            <CardContent>
-                              <Typography gutterBottom variant="h5" component="h2">
-                                Lizard
-          </Typography>
-                              <Typography component="p">
-                                Lizards are a widespread group of squamate reptiles, with over 6,000 species, ranging
-                                across all continents except Antarctica
-          </Typography>
-                            </CardContent>
-                          </CardActionArea>
-                          <CardActions>
-                            <Button size="small" color="primary">
-                              Share
-        </Button>
-                            <Button size="small" color="primary">
-                              Learn More
-        </Button>
-                          </CardActions>
-                        </Card>
-                      </div>}
-
-
-                      <div>
-
-                        {this.state.activeStep === steps.length ? (
-                          <div>
-                            <Typography className={classes.instructions}>All steps completed</Typography>
-                            <Button onClick={this.handleReset}>Reset</Button>
-                          </div>
-                        ) : (
-                            <div>
-                              <Typography className={classes.instructions}>{getStepContent(activeStep)}</Typography>
-                              <div>
-                                <Button
-                                  disabled={activeStep === 0}
-                                  onClick={this.handleBack}
-                                  className={classes.backButton}>
-                                  Back
-                                </Button>
-                                
-                                {activeStep === steps.length - 1 && 
-                                <Button variant="contained" color="primary" type="submit">
-                                   Concluir
-                                </Button>
-
-                                 }
-                                 { activeStep != steps.length - 1 &&
-                                    <Button variant="contained" color="primary" onClick={this.handleNext}>
-                                    Próximo
-                                  </Button>
-                                 }                                
-                              </div>
-                            </div>
-                          )}
-                      </div>
-
-                    </div>
-                  </div>
-                  </div>
+                <Typography variant="h4" gutterBottom>Cadastro de Funcionários</Typography>
+                <Divider light />
               </Grid>
-            </form>
-          </Grid>
+              <Grid item xs={8}>
+                <TextField
+                  className={classes.containerInput}
+                  label="Nome"
+                  value={this.state.contact.name}
+                  onChange={this.handleChange('name')}
+                  id="name"
+                />
+              </Grid>
+              <Grid item xs={4}>
+                <TextField
+                  className={classes.containerInput}
+                  label="Usuário"
+                  value={this.state.contact.userName}
+                  onChange={this.handleChange('userName')}
+                  id="userName"
+                />
+              </Grid>
+              <Grid item xs={3}>
+                <TextField
+                  className={classes.containerInput}
+                  label="Data de Nascimento"
+                  value={this.state.contact.dateBirth}
+                  onChange={this.handleChange('dateBirth')}
+                  id="dateBirth"
+                  type="date"
+                  defaultValue="2017-05-24"
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+
+                />
+              </Grid>
+              <Grid item xs={5}>
+                <TextField
+                  className={classes.containerInput}
+                  label="Email"
+                  value={this.state.contact.email}
+                  onChange={this.handleChange('email')}
+                  type="email"
+                  required
+                  id="email"
+                />
+              </Grid>
+              <Grid item xs={4}>
+                <TextField
+                  id="sex"
+                  select
+                  label="Sexo"
+                  className={classes.containerInput}
+                  value={this.state.contact.sex}
+                  onChange={this.handleChange('sex')}
+                  helperText="Selecione seu Sexo"
+                >
+                  {selectSex.map(option => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </Grid>
+              <Grid item xs={4}>
+                <TextField
+                  className={classes.containerInput}
+                  label="Telefone Celular"
+                  value={this.state.contact.phone}
+                  onChange={this.handleChange('phone')}
+                  id="phone"
+                  InputProps={{
+                    inputComponent: TextMaskCustom,
+                  }}
+                />
+              </Grid>
+
+              <Grid item xs={4}>
+                <TextField
+                  className={classes.containerInput}
+                  label="Telefone Residencial"
+                  value={this.state.contact.phone1}
+                  onChange={this.handleChange('phone1')}
+                  id="phone1"
+                  InputProps={{
+                    inputComponent: TextMaskCustom,
+                  }}
+                />
+              </Grid>
+
+              <Grid item xs={4}>
+                <TextField
+                  className={classes.containerInput}
+                  label="Telefone Comercial"
+                  value={this.state.contact.phone2}
+                  onChange={this.handleChange('phone2')}
+                  id="phone2"
+                  InputProps={{
+                    inputComponent: TextMaskCustom,
+                  }}
+                />
+              </Grid>
+
+              <Grid item xs={3}>
+                <TextField
+                  className={classes.containerInput}
+                  label="Salário"
+                  value={this.state.contact.salary}
+                  onChange={this.handleChange('salary')}
+                  id="salary"
+                  InputProps={{
+                    inputComponent: NumberFormatCustom,
+                  }}
+                />
+              </Grid>
+              <Grid item xs={3} >
+                <TextField
+                  id="comission"
+                  label="Comissão (%)"
+                  value={this.state.contact.comission}
+                  onChange={this.handleChange('commission')}
+                  type="number"
+                  className={classes.containerInput}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                />
+              </Grid>
+              <Grid item xs={3}>
+                <TextField
+                  id="office"
+                  select
+                  label="Cargo"
+                  className={classes.containerInput}
+                  value={this.state.contact.office}
+                  onChange={this.handleChange('office')}
+                  SelectProps={{
+                    native: false,
+                    MenuProps: {
+                      className: classes.menu,
+                    },
+                  }}
+                  helperText="Please select your currency"
+                >
+                  {officer.map(option => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </TextField>
+              </Grid>
+                <Grid item xs={3} >
+                  <TextField
+                    id="crmv"
+                    label="CRMV"
+                    disabled={this.verifyCrmv}
+                    className={classes.containerInput}
+                    value={this.state.contact.crmv}
+                    onChange={this.handleChange('crmv')}
+
+                  />
+                </Grid>
+            </Grid>
+          </form>
+
         </main>
       </div>
     );

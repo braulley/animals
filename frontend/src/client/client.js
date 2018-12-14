@@ -14,13 +14,17 @@ import CardActionArea from '@material-ui/core/CardActionArea'
 import CardActions from '@material-ui/core/CardActions'
 import CardContent from '@material-ui/core/CardContent'
 import CardMedia from '@material-ui/core/CardMedia'
-import { Field, reduxForm } from 'redux-form'
 import InputLabel from '@material-ui/core/InputLabel'
 import FormHelperText from '@material-ui/core/FormHelperText'
 import TextField from '@material-ui/core/TextField'
 import StepLabel from '@material-ui/core/StepLabel'
-
+import AccountCircle from '@material-ui/icons/AccountCircle'
+import Divider from '@material-ui/core/Divider'
 import './client.css'
+import Select from '@material-ui/core/Select'
+import FormControl from '@material-ui/core/FormControl'
+import MenuItem from '@material-ui/core/MenuItem'
+
 
 const styles = theme => ({
   root: {
@@ -47,10 +51,6 @@ const styles = theme => ({
   input: {
     margin: theme.spacing.unit,
   },
-  containerInput: {
-    display: 'flex',
-    flexWrap: 'wrap',
-  },
   rootLayout: {
     flexGrow: 1,
   },
@@ -63,10 +63,26 @@ const styles = theme => ({
   textField: {
     marginLeft: theme.spacing.unit,
     marginRight: theme.spacing.unit,
-    width: 200,
+    display: 'flex',
+    flexWrap: 'wrap',
   },
 });
 
+
+const sexArray = [
+  {
+    value: '0',
+    label: '',
+  },
+  {
+    value: '1',
+    label: 'Feminino',
+  },
+  {
+    value: '2',
+    label: 'Masculino',
+  },
+];
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 
@@ -103,31 +119,6 @@ const validate = values => {
   return errors
 }
 
-const renderTextField = ({
-  label,
-  input,
-  meta: { touched, invalid, error },
-  ...custom
-}) => (
-    <TextField
-      label={label}
-      placeholder={label}
-      error={touched && invalid}
-      helperText={touched && error}
-      {...input}
-      {...custom}
-    />
-  )
-
-const renderFromHelper = ({ touched, error }) => {
-  if (!(touched && error)) {
-    return
-  } else {
-    return <FormHelperText>{touched && error}</FormHelperText>
-  }
-}
-
-
 
 function getSteps() {
   return ['Dados Pessoais', 'Contato', 'Endereço', 'Finalizar'];
@@ -149,10 +140,30 @@ function getStepContent(step) {
 }
 
 class Client extends React.Component {
+
   state = {
-    activeStep: 0,
-    completed: {},
-    step: 1,
+    contact: {
+      name: '',
+      registerCode: '',
+      nacionality: '',
+      dateBirth: Date(),
+      office: '',
+      email: '',
+      phone: '',
+      phone1: '',
+      phone2: '',
+      sex: '',
+    },
+    address: {
+      street: '',
+      number: 0,
+      complement: '',
+      neighborhood: '',
+      city: '',
+      states: '',
+      country: '',
+
+    }
   };
 
   totalSteps = () => {
@@ -218,313 +229,195 @@ class Client extends React.Component {
         <Header />
         <main className={classes.content}>
           <div className={classes.toolbar} />
-          <form onSubmit={handleSubmit}>
+          <form noValidate autoComplete="off">
             <Grid container spacing={24}>
               <Grid item xs={12}>
-                <div className={classes.root}>
-                  <Stepper activeStep={activeStep} alternativeLabel>
-                    {steps.map(label => {
-                      return (
-                        <Step key={label}>
-                          <StepLabel>{label}</StepLabel>
-                        </Step>
-                      );
-                    })}
-                  </Stepper>
-                  <div>
-                    {this.allStepsCompleted() ? (
-                      <div>
-                        <Typography className={classes.instructions}>
-                          All steps completed - you&apos;re finished
-                </Typography>
-                        <Button onClick={this.handleReset}>Reset</Button>
-                      </div>
-                    ) : (
-                        <div >
-                          {this.state.activeStep === 0 && <div className={classes.rootLayout}>
-                            <Grid container spacing={24}>
-
-                              <Grid item xs={12} >
-                                <div className={classes.containerInput}>
-                                  <Input
-                                    defaultValue="Nome"
-                                    className="input"
-                                    inputProps={{
-                                      'aria-label': 'Description',
-                                    }}
-                                  />
-                                </div>
-                              </Grid>
-                              <Grid item xs={6} >
-                                <div className={classes.containerInput}>
-                                  <Input
-                                    placeholder="CPF"
-                                    className="input"
-                                    inputProps={{
-                                      'aria-label': 'Description',
-                                    }}
-                                  />
-                                </div>
-                              </Grid>
-
-                              <Grid item xs={6} >
-                                <div className={classes.containerInput}>
-                                  <Input
-                                    placeholder="Nacionalidade"
-                                    className="input"
-                                    inputProps={{
-                                      'aria-label': 'Description',
-                                    }}
-                                  />
-                                </div>
-                              </Grid>
-
-                              <Grid item xs={4} >
-                                <div className={classes.containerInput}>
-                                  <Input
-                                    id="date"
-                                    label="Data de Nascimento"
-                                    type="date"
-                                    defaultValue="2017-05-24"
-                                    className={classes.textField}
-                                    InputLabelProps={{
-                                      shrink: true,
-                                    }}
-                                  />
-                                </div>
-                              </Grid>
-
-                              <Grid item xs={4} >
-                                <div className={classes.containerInput}>
-                                  <Input
-                                    placeholder="Estado Civil"
-                                    className="input"
-                                    inputProps={{
-                                      'aria-label': 'Description',
-                                    }}
-                                  />
-                                </div>
-                              </Grid>
-
-                              <Grid item xs={4} >
-                                <div className={classes.containerInput}>
-                                  <Input
-                                    placeholder="Sexo"
-                                    className="input"
-                                    inputProps={{
-                                      'aria-label': 'Description',
-                                    }}
-                                  />
-                                </div>
-                              </Grid>
-                            </Grid>
-                          </div>}
-
-                          {this.state.activeStep === 1 && <div className={classes.rootLayout}>
-                            <Grid container spacing={24}>
-
-                              <Grid item xs={6} >
-                                <div className={classes.containerInput}>
-                                  <Input
-                                    placeholder="Email"
-                                    className="input"
-                                    inputProps={{
-                                      'aria-label': 'Description',
-                                    }}
-                                  />
-                                </div>
-                              </Grid>
-                              <Grid item xs={6} >
-                                <div className={classes.containerInput}>
-                                  <Input
-                                    placeholder="Celular 1"
-                                    className="input"
-                                    inputProps={{
-                                      'aria-label': 'Description',
-                                    }}
-                                  />
-                                </div>
-                              </Grid>
-
-                              <Grid item xs={6} >
-                                <div className={classes.containerInput}>
-                                  <Input
-                                    placeholder="Telefone Comercial"
-                                    className="input"
-                                    inputProps={{
-                                      'aria-label': 'Description',
-                                    }}
-                                  />
-                                </div>
-                              </Grid>
-
-                              <Grid item xs={6} >
-                                <div className={classes.containerInput}>
-                                  <Input
-                                    placeholder="Telefone Residencial"
-                                    className="input"
-                                    inputProps={{
-                                      'aria-label': 'Description',
-                                    }}
-                                  />
-                                </div>
-                              </Grid>
-                            </Grid>
-                          </div>}
-
-                          {this.state.activeStep === 2 && <div className={classes.rootLayout}>
-                            <Grid container spacing={24}>
-
-                              <Grid item xs={12} >
-                                <div className={classes.containerInput}>
-                                  <Input
-                                    placeholder="Logradouro"
-                                    className="input"
-                                    inputProps={{
-                                      'aria-label': 'Description',
-                                    }}
-                                  />
-                                </div>
-                              </Grid>
-
-                              <Grid item xs={4} >
-                                <div className={classes.containerInput}>
-                                  <Input
-                                    placeholder="CEP"
-                                    className="input"
-                                    inputProps={{
-                                      'aria-label': 'Description',
-                                    }}
-                                  />
-                                </div>
-                              </Grid>
-
-                              <Grid item xs={4} >
-                                <div className={classes.containerInput}>
-                                  <Input
-                                    placeholder="Número"
-                                    className="input"
-                                    inputProps={{
-                                      'aria-label': 'Description',
-                                    }}
-                                  />
-                                </div>
-                              </Grid>
-
-                              <Grid item xs={4} >
-                                <div className={classes.containerInput}>
-                                  <Input
-                                    placeholder="Complemento"
-                                    className="input"
-                                    inputProps={{
-                                      'aria-label': 'Description',
-                                    }}
-                                  />
-                                </div>
-                              </Grid>
-
-                              <Grid item xs={6} >
-                                <div className={classes.containerInput}>
-                                  <Input
-                                    placeholder="Bairro"
-                                    className="input"
-                                    inputProps={{
-                                      'aria-label': 'Description',
-                                    }}
-                                  />
-                                </div>
-                              </Grid>
-
-                              <Grid item xs={6} >
-                                <div className={classes.containerInput}>
-                                  <Input
-                                    placeholder="Cidade"
-                                    className="input"
-                                    inputProps={{
-                                      'aria-label': 'Description',
-                                    }}
-                                  />
-                                </div>
-                              </Grid>
-
-                              <Grid item xs={6} >
-                                <div className={classes.containerInput}>
-                                  <Input
-                                    placeholder="Estado"
-                                    className="input"
-                                    inputProps={{
-                                      'aria-label': 'Description',
-                                    }}
-                                  />
-                                </div>
-                              </Grid>
-
-                              <Grid item xs={6} >
-                                <div className={classes.containerInput}>
-                                  <Input
-                                    placeholder="País"
-                                    className="input"
-                                    inputProps={{
-                                      'aria-label': 'Description',
-                                    }}
-                                  />
-                                </div>
-                              </Grid>
-                            </Grid>
-                          </div>}
-
-                          {this.state.activeStep === 3 && <div className={classes.rootLayout}>
-                            <Card className={classes.card}>
-                              <CardActionArea>
-                                <CardMedia
-                                  className={classes.media}
-                                  image="/static/images/cards/contemplative-reptile.jpg"
-                                  title="Contemplative Reptile"
-                                />
-                                <CardContent>
-                                  <Typography gutterBottom variant="h5" component="h2">
-                                    Lizard
-          </Typography>
-                                  <Typography component="p">
-                                    Lizards are a widespread group of squamate reptiles, with over 6,000 species, ranging
-                                    across all continents except Antarctica
-          </Typography>
-                                </CardContent>
-                              </CardActionArea>
-                              <CardActions>
-                                <Button size="small" color="primary">
-                                  Share
-        </Button>
-                                <Button size="small" color="primary">
-                                  Learn More
-        </Button>
-                              </CardActions>
-                            </Card>
-                          </div>}
+                <Typography variant="h4" gutterBottom>Cadastro de Clientes</Typography>
+                <Divider light />
+              </Grid>
+              <Grid item xs={7}>
+                <TextField
+                  id="name"
+                  label="Name"
+                  className={classes.textField}
+                  value={this.state.contact.name}
+                  margin="normal"
+                />
+              </Grid>
+              <Grid item xs={5}>
+                <TextField
+                  id="cpf"
+                  label="CPF"
+                  className={classes.textField}
+                  value={this.state.contact.registerCode}
+                  margin="normal"
+                />
+              </Grid>
+              <Grid item xs={5}>
+                <TextField
+                  id="nac"
+                  label="Nacionalidade"
+                  className={classes.textField}
+                  value={this.state.contact.nacionality}
+                  margin="normal"
+                />
+              </Grid>
+              <Grid item xs={4} >
+                <TextField
+                  id="birth"
+                  label="Data de Nascimento"
+                  className={classes.textField}
+                  value={this.state.contact.dateBirth}
+                  margin="normal"
+                />
+              </Grid>
+              <Grid item xs={3}>
+                <TextField
+                  id="standard-select-currency"
+                  select
+                  label="Select"
+                  className={classes.textField}
+                  value={this.state.contact.sex }
+                  SelectProps={{
+                    MenuProps: {
+                      className: classes.menu,
+                    },
+                  }}
+                  helperText="Please select your currency"
+                  margin="normal"
+                >
+                  {sexArray.map(option => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </Grid>
+              <Grid item xs={4}>
+                <TextField
+                  id="office"
+                  label="Cargo"
+                  className={classes.textField}
+                  value={this.state.contact.office}
+                  margin="normal"
+                />
+              </Grid>
+              <Grid item xs={8}>
+                <TextField
+                  id="email"
+                  label="Email"
+                  className={classes.textField}
+                  value={this.state.contact.email}
+                  margin="normal"
+                />
+              </Grid>
+              <Grid item xs={4}>
+                <TextField
+                  id="tel"
+                  label="Celular"
+                  className={classes.textField}
+                  value={this.state.contact.phone}
+                  margin="normal"
+                />
+              </Grid>
+              <Grid item xs={4}>
+                <TextField
+                  id="tel1"
+                  label="Residencial"
+                  className={classes.textField}
+                  value={this.state.contact.phone1}
+                  margin="normal"
+                />
+              </Grid>
+              <Grid item xs={4}>
+                <TextField
+                  id="tel2"
+                  label="Tel.COmercial"
+                  className={classes.textField}
+                  value={this.state.contact.phone2}
+                  margin="normal"
+                />
+              </Grid>
+              <Grid item xs={4}>
+                <TextField
+                  id="cep"
+                  label="CEP"
+                  className={classes.textField}
+                  value={this.state.zipCode}
+                  margin="normal"
+                />
+              </Grid>
+              <Grid item xs={8}>
+                <TextField
+                  id="street"
+                  label="Logradouro"
+                  className={classes.textField}
+                  value={this.state.address.street}
+                  margin="normal"
+                />
+              </Grid>
+              <Grid item xs={3}>
+                <TextField
+                  id="number"
+                  label="Número"
+                  className={classes.textField}
+                  value={this.state.address.number}
+                  margin="normal"
+                />
+              </Grid>
+              <Grid item xs={4}>
+                <TextField
+                  id="complement"
+                  label="Complemento"
+                  className={classes.textField}
+                  value={this.state.address.complement}
+                  margin="normal"
+                />
+              </Grid>
+              <Grid item xs={5}>
+                <TextField
+                  id="neighborhood"
+                  label="Bairro"
+                  className={classes.textField}
+                  value={this.state.address.neighborhood}
+                  margin="normal"
+                />
+              </Grid>
 
 
-                          <div>
-                            <Button
-                              disabled={activeStep === 0}
-                              onClick={this.handleBack}
-                              className={classes.backButton}
-                            >Back</Button>
-                            {activeStep === steps.length - 1 &&
-                            <Button variant="contained" color="primary" onClick={this.handleNext}>
-                              Concluir
-                            </Button>} 
-                            {activeStep !== steps.length - 1 &&
-                              <Button variant="contained" color="primary" onClick={this.handleNext}>
-                              Próximo
-                            </Button>
-                            }                           
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                  </div>
-                </div>
+              <Grid item xs={4}>
+                <TextField
+                  id="city"
+                  label="Cidade"
+                  className={classes.textField}
+                  value={this.state.address.city}
+                  margin="normal"
+                />
+              </Grid>
 
+              <Grid item xs={4}>
+                <TextField
+                  id="state"
+                  label="Estado"
+                  className={classes.textField}
+                  value={this.state.address.states}
+                  margin="normal"
+                />
+              </Grid>
+
+              <Grid item xs={4}>
+                <TextField
+                  id="country"
+                  label="País"
+                  className={classes.textField}
+                  value={this.state.address.country}
+                  margin="normal"
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <Button variant="outlined" color="primary" className={classes.button}>
+                  Primary
+      </Button>
               </Grid>
             </Grid>
           </form>
@@ -538,10 +431,5 @@ Client.propTypes = {
   classes: PropTypes.object,
 };
 
-//export default withStyles(styles)(Client);
+export default withStyles(styles)(Client);
 
-export default reduxForm({
-  form: 'Client', // a unique identifier for this form
-  validate,
-  asyncValidate
-})(withStyles(styles)(Client))
