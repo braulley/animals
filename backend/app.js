@@ -11,8 +11,6 @@ var db = require('./connect/connect');
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function() {
   console.log('Conectado');
-  var address = mongoose.model('address', schema);
-
 });
 
 var indexRouter = require('./routes/index');

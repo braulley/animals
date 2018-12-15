@@ -28,6 +28,7 @@ import MaskedInput from 'react-text-mask'
 import Icon from '@material-ui/core/Icon'
 import SaveIcon from '@material-ui/icons/Save'
 import classNames from 'classnames'
+import ViaCep from '../service/viaCep'
 
 const styles = theme => ({
   root: {
@@ -202,6 +203,7 @@ class User extends React.Component {
       skipped: new Set(),
       error: true,
       verifyCrmv: true,
+      invalidLocation: false,
       errorMessage: {
         name: '',
         registerCode: '',
@@ -268,7 +270,7 @@ class User extends React.Component {
     const contact = this.state.contact;
     contact[name] = event.target.value;
     this.setState({ contact: contact });
-    console.log(contact[name])
+    console.log(name)
 
     if (contact[name] === 3) {
       this.setState({ verifyCrmv: false })
@@ -423,7 +425,6 @@ class User extends React.Component {
                   id="email"
                 />
               </Grid>
-
               <Grid item xs={4}>
                 <TextField
                   id="sex"
@@ -442,7 +443,6 @@ class User extends React.Component {
                   ))}
                 </TextField>
               </Grid>
-
               <Grid item xs={4}>
                 <TextField
                   className={classes.containerInput}
@@ -455,7 +455,6 @@ class User extends React.Component {
                   }}
                 />
               </Grid>
-
               <Grid item xs={4}>
                 <TextField
                   className={classes.containerInput}
@@ -468,7 +467,6 @@ class User extends React.Component {
                   }}
                 />
               </Grid>
-
               <Grid item xs={3}>
                 <TextField
                   className={classes.containerInput}
@@ -527,10 +525,8 @@ class User extends React.Component {
                   className={classes.containerInput}
                   value={this.state.contact.crmv}
                   onChange={this.handleChange('crmv')}
-
                 />
               </Grid>
-
               <Grid item xs={3} >
                 <TextField
                   id="zipCode"
@@ -541,7 +537,6 @@ class User extends React.Component {
                   onChange={this.handleChangeAddress('zipCode')}
                 />
               </Grid>
-
               <Grid item xs={9} >
                 <TextField
                   id="street"
@@ -619,11 +614,8 @@ class User extends React.Component {
                 <Button variant="contained" color="primary" 
                 className={classes.button} 
                 disabled={this.state.error}
-                type="submit"
-                >
-                  Salvar
-        {/* This Button uses a Font Icon, see the installation instructions in the docs. */}
-                  <SaveIcon className={classNames(classes.rightIcon)} />
+                type="submit">
+                  Salvar<SaveIcon className={classNames(classes.rightIcon)} />
                 </Button>
               </Grid>
             </Grid>

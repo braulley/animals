@@ -24,6 +24,7 @@ import './client.css'
 import Select from '@material-ui/core/Select'
 import FormControl from '@material-ui/core/FormControl'
 import MenuItem from '@material-ui/core/MenuItem'
+import ViaCep from '../service/viaCep'
 
 
 const styles = theme => ({
