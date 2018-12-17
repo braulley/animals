@@ -29,6 +29,7 @@ import Icon from '@material-ui/core/Icon'
 import SaveIcon from '@material-ui/icons/Save'
 import classNames from 'classnames'
 import ViaCep from '../service/viaCep'
+import axios from 'axios'
 
 const styles = theme => ({
   root: {
@@ -191,6 +192,21 @@ function TextMaskEmail(props) {
   );
 }
 
+function TextMaskZipCode(props) {
+  const { inputRef, ...other } = props;
+
+  return (
+    <MaskedInput
+      {...other}
+      ref={inputRef}
+      mask={[/[1-9]/, /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/]}
+      placeholderChar={'\u2000'}
+      showMask
+    />
+  );
+}
+
+
 class User extends React.Component {
 
   constructor(props) {
@@ -214,20 +230,20 @@ class User extends React.Component {
         sex: '',
         office: '',
         crmv: '',
-        comission: 0,
-        salary: 0.00,
+        comission: '',
+        salary: '',
         email: '',
         phone: '',
         phone1: '',
         phone2: '',
         street: '',
         zipCode: '',
-        number: 0,
+        number: '',
         complement: '',
         neighborhood: '',
         city: '',
         states: '',
-        country: '',
+        password: '',
       },
       contact: {
         name: '',
@@ -259,10 +275,8 @@ class User extends React.Component {
     };
 
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleBlur = this.handleBlur.bind(this);
   }
-
-
-
 
 
   handleChange = name => event => {
@@ -281,6 +295,21 @@ class User extends React.Component {
     this.validation()
   }
 
+  handleBlur() {
+    if (this.state.address.zipCode != '') {
+      let address = Object.assign({}, this.state.address)
+      ViaCep.getByCep(this.state.address.zipCode)
+        .then(res => {
+          address.neighborhood = res.bairro
+          address.city = res.localidade
+          address.street = res.logradouro
+          address.states = res.uf
+          this.setState({ address: address })
+        }).catch(err => {
+          alert(err);
+        })
+    }
+  }
 
   validation() {
     if (this.state.contact.name === '') {
@@ -311,7 +340,7 @@ class User extends React.Component {
       this.state.errorMessage.phone1 = '* Preencha um valor válido.'
       this.state.error = false
     }
-    else if (this.state.address.zipCode == '' || this.state.address.zipCode.length != 9) {
+    else if (this.state.address.zipCode == '' || this.state.address.zipCode.length != 9 || !ViaCep.isValidZipcode(this.state.address.zipCode)) {
       this.state.errorMessage.zipCode = '* Preencha o CEP.'
       this.state.error = false
     }
@@ -341,7 +370,15 @@ class User extends React.Component {
   handleSubmit(event) {
     alert('A name was submitted: ' + this.state.contact);
     event.preventDefault();
-    console.log(this.state.contact)
+    let user = {
+      contact: this.state.contact,
+      address: this.state.address
+    }
+    axios.post(`http://localhost:4000/users/register`, { user })
+      .then(res => {
+        console.log(res);
+        console.log(res.data);
+      })
   }
 
 
@@ -535,6 +572,10 @@ class User extends React.Component {
                   className={classes.containerInput}
                   value={this.state.address.zipCode}
                   onChange={this.handleChangeAddress('zipCode')}
+                  onBlur={this.handleBlur}
+                  InputProps={{
+                    inputComponent: TextMaskZipCode,
+                  }}
                 />
               </Grid>
               <Grid item xs={9} >
@@ -601,20 +642,23 @@ class User extends React.Component {
 
               <Grid item xs={4} >
                 <TextField
-                  id="country"
-                  label="País"
+                  id="standard-password-input"
+                  label="Senha"
                   className={classes.containerInput}
-                  value={this.state.address.country}
-                  onChange={this.handleChangeAddress('country')}
+                  required
+                  type="password"
+                  value={this.state.contact.password}
+                  autoComplete="current-password"
+                  margin="normal"
                 />
               </Grid>
 
               <Grid item xs={9}></Grid>
               <Grid item xs={3}>
-                <Button variant="contained" color="primary" 
-                className={classes.button} 
-                disabled={this.state.error}
-                type="submit">
+                <Button variant="contained" color="primary" type="submit"
+                  className={classes.button}
+                  disabled={this.state.error}
+                  type="submit">
                   Salvar<SaveIcon className={classNames(classes.rightIcon)} />
                 </Button>
               </Grid>
