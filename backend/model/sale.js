@@ -1,14 +1,30 @@
-var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
+class Sale {
 
-var ObjectId = mongoose.Schema.Types.ObjectId;
-var salesman = require('./user');
+    constructor(){}
 
-var sale = new Schema({
-    _id: ObjectId,
-    salesman: [salesman],
-    date_sale: {type: Date, default: Date.now },
-    total_value: Number
-});
+    //salesman
+    set salesman(salesman) {
+        this._salesman = salesman;
+    }
+    get salesman() {
+        return this._salesman;
+    }
 
-module.exports = sale;
+    //date_sale
+    set date_sale(date_sale) {
+        this._date_sale = date_sale;
+    }
+    get date_sale() {
+        return this._date_sale;
+    }
+
+    //total_value
+    set total_value(total_value) {
+        this._total_value = total_value;
+    }
+    get total_value() {
+        return this._total_value;
+    }
+}
+
+module.exports = Sale;

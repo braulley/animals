@@ -1,78 +1,26 @@
-const config = require('../config/config.json');
-const jwt = require('jsonwebtoken');
+var userDao = require('../dao/userDao');
 
-const bcrypt = require('bcryptjs');
-const db = require('../_helpers/error-handler');
-const dbU = require('../model/createModels');
-const User = dbU.User;
 
-async function authenticate({ username, password }) {
-    const user = await User.findOne({ username });
-    if (user && bcrypt.compareSync(password, user.hash)) {
-        const { hash, ...userWithoutHash } = user.toObject();
-        const token = jwt.sign({ sub: user.id }, config.secret);
-        return {
-            ...userWithoutHash,
-            token
-        };
-    }
+async function _insert(params) {
+    return await userDao._create(params);
 }
 
-async function getAll() {
-    return await User.find().select('-hash');
+async function _update(params) {
+    return await userDao._update(params);
 }
 
-async function getById(id) {
-    return await User.findById(id).select('-hash');
-}
-
-async function create(userParam) {
-    // validate
-    console.log(userParam);
-    if (await User.findOne({ username: userParam.username })) {
-        throw 'Username "' + userParam.username + '" is already taken';
-    }
-
-    const user = new User(userParam);
-
-    // hash password
-    if (userParam.password) {
-        user.hash = bcrypt.hashSync(userParam.password, 10);
-    }
-
-    // save user
-    await user.save();
-}
-
-async function update(id, userParam) {
-    const user = await User.findById(id);
-
-    // validate
-    if (!user) throw 'User not found';
-    if (user.username !== userParam.username && await User.findOne({ username: userParam.username })) {
-        throw 'Username "' + userParam.username + '" is already taken';
-    }
-
-    // hash password if it was entered
-    if (userParam.password) {
-        userParam.hash = bcrypt.hashSync(userParam.password, 10);
-    }
-
-    // copy userParam properties to user
-    Object.assign(user, userParam);
-
-    await user.save();
+async function _get() {
+    return await userDao._get();
 }
 
 async function _delete(id) {
-    await User.findByIdAndRemove(id);
+    return await userDao._delete(id);
 }
 
+
 module.exports = {
-    authenticate,
-    getAll,
-    getById,
-    create,
-    update,
-    delete: _delete
+    _insert,
+    _update,
+    _get,
+    _delete
 };

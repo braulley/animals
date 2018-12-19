@@ -1,20 +1,29 @@
-var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
+class Product {
 
-var user = require('./user');
-var pet = require('./pet');
+    constructor(){}
 
-var ObjectId = mongoose.Schema.Types.ObjectId;
+    //name
+    set name(name) {
+        this._name = name;
+    }
+    get name() {
+        return this._name;
+    }
+    //value
+    set value(value) {
+        this._value = value;
+    }
+    get value() {
+        return this._value;
+    }
 
-var consultation = new Schema({
-    _id: ObjectId,
-    clerk:  [user],
-    client: [user],
-    pet:   [pet],
-    veterinary: [user],
-    scheduling: Date,
-    enchiridion: String,   
-    recipe: String
-});
+    //amount
+    set amount(amount) {
+        this._amount = amount;
+    }
+    get amount() {
+        return this._amount;
+    }
+}
 
-module.exports = consultation;
+module.exports = Product;

@@ -1,19 +1,78 @@
-var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
+class Address {
 
-var ObjectId = mongoose.Schema.Types.ObjectId;
+    constructor() {
+    }
+    //Street
+    set street(street) {
+      this._street = name;
+    }
+    get street() {
+      return this._street;
+    } 
+    
+    //number
+    set street(number) {
+        this._number = number;
+    }
+    get street() {
+        return this._number;
+    } 
+    
+    //ZipCOde
+    set zipCode(zipCode) {
+        this._zipCode = zipCode;
+    }
+    get zipCode() {
+        return this._zipCode;
+    }  
+    
+    //Complement
+    set complement(complement) {
+        this._complement = complement;
+    }
+    get complement() {
+        return this._complement;
+    }
+    
+    //Complement
+    set complement(complement) {
+        this._complement = complement;
+    }
+    get complement() {
+        return this._complement;
+    }
 
-var address = new Schema({
-    _id: ObjectId,
-    street:  { type: String, required: true },
-    Number: {type: Number, required: true },
-    zipCode:   {type: String, required: true},
-    complement: String,    
-    neighborhood:  String,
-    city: {type: String, required: true},
-    state: {type: String, required: true},
-    coutry: {type: String, required: true},
-    create_at: { type: Date, default: Date.now }
-});
+    //Neighborhood
+    set neighborhood(neighborhood) {
+        this._neighborhood = neighborhood;
+    }
+    get neighborhood() {
+        return this._neighborhood;
+    }
 
-module.exports = address;
+    //City
+    set city(city) {
+        this._city = city;
+    }
+    get city() {
+        return this._city;
+    }
+
+    //State
+    set state(state) {
+        this._state = state;
+    }
+    get state() {
+        return this._state;
+    }
+
+    //Location
+    set location(location) {
+        this._location = location;
+    }
+    get location() {
+        return this._location;
+    }
+}
+
+module.exports = Address;
