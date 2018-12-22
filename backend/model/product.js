@@ -1,29 +1,16 @@
-class Product {
 
-    constructor(){}
+module.exports = (sequelize, Sequelize) => {
+    const Product = sequelize.define('products', {
+        name: {
+            type: Sequelize.STRING
+        },
+        value: {
+            type: Sequelize.DECIMAL(10, 2) 
+        },
+        amount: {
+            type: Sequelize.STRING
+        }
+    });
 
-    //name
-    set name(name) {
-        this._name = name;
-    }
-    get name() {
-        return this._name;
-    }
-    //value
-    set value(value) {
-        this._value = value;
-    }
-    get value() {
-        return this._value;
-    }
-
-    //amount
-    set amount(amount) {
-        this._amount = amount;
-    }
-    get amount() {
-        return this._amount;
-    }
+    return Product;
 }
-
-module.exports = Product;

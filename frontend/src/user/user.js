@@ -546,7 +546,7 @@ class User extends React.Component {
                 <TextField
                   id="type"
                   select
-                  label="Tipo de EMpregado"
+                  label="Tipo de Empregado"
                   required
                   className={classes.containerInput}
                   value={this.state.contact.type}
