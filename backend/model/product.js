@@ -1,20 +1,16 @@
-var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
 
-var user = require('./user');
-var pet = require('./pet');
+module.exports = (sequelize, Sequelize) => {
+    const Product = sequelize.define('products', {
+        name: {
+            type: Sequelize.STRING
+        },
+        value: {
+            type: Sequelize.DECIMAL(10, 2) 
+        },
+        amount: {
+            type: Sequelize.STRING
+        }
+    });
 
-var ObjectId = mongoose.Schema.Types.ObjectId;
-
-var consultation = new Schema({
-    _id: ObjectId,
-    clerk:  [user],
-    client: [user],
-    pet:   [pet],
-    veterinary: [user],
-    scheduling: Date,
-    enchiridion: String,   
-    recipe: String
-});
-
-module.exports = consultation;
+    return Product;
+}

@@ -127,19 +127,19 @@ const officer = [
     label: '',
   },
   {
-    value: 1,
+    value: 'C',
     label: 'Atendente',
   },
   {
-    value: 2,
+    value: 'S',
     label: 'Vendedor',
   },
   {
-    value: 3,
+    value: 'v',
     label: 'Veterinário',
   },
   {
-    value: 4,
+    value: 'A',
     label: 'Administrador',
   }
 ]
@@ -228,7 +228,7 @@ class User extends React.Component {
         dateBirth: Date(),
         maritalStatus: '',
         sex: '',
-        office: '',
+        type: '',
         crmv: '',
         comission: '',
         salary: '',
@@ -252,7 +252,7 @@ class User extends React.Component {
         dateBirth: Date(),
         maritalStatus: '',
         sex: '',
-        office: '',
+        type: '',
         crmv: '',
         comission: 0,
         salary: 0.00,
@@ -261,6 +261,8 @@ class User extends React.Component {
         phone1: '',
         phone2: '',
         userName: '',
+        ocupation: '',
+        password: '',
       },
       address: {
         street: '',
@@ -270,7 +272,7 @@ class User extends React.Component {
         neighborhood: '',
         city: '',
         states: '',
-        country: '',
+        location: '',
       },
     };
 
@@ -344,8 +346,8 @@ class User extends React.Component {
       this.state.errorMessage.zipCode = '* Preencha o CEP.'
       this.state.error = false
     }
-    else if (this.state.contact.office == '') {
-      this.state.errorMessage.zipCode = '* Preencha o Cargo correto.'
+    else if (this.state.contact.type == '') {
+      this.state.errorMessage.type = '* Preencha o Tipo correto.'
       this.state.error = false
     } else if (this.state.contact.salary <= 0) {
       this.state.error = false
@@ -368,7 +370,7 @@ class User extends React.Component {
 
 
   handleSubmit(event) {
-    alert('A name was submitted: ' + this.state.contact);
+    console.log('A name was submitted: ' + this.state.contact);
     event.preventDefault();
     let user = {
       contact: this.state.contact,
@@ -462,7 +464,7 @@ class User extends React.Component {
                   id="email"
                 />
               </Grid>
-              <Grid item xs={4}>
+              <Grid item xs={3}>
                 <TextField
                   id="sex"
                   select
@@ -480,7 +482,7 @@ class User extends React.Component {
                   ))}
                 </TextField>
               </Grid>
-              <Grid item xs={4}>
+              <Grid item xs={3}>
                 <TextField
                   className={classes.containerInput}
                   label="Telefone Celular"
@@ -492,7 +494,7 @@ class User extends React.Component {
                   }}
                 />
               </Grid>
-              <Grid item xs={4}>
+              <Grid item xs={3}>
                 <TextField
                   className={classes.containerInput}
                   label="Telefone Residencial"
@@ -502,6 +504,16 @@ class User extends React.Component {
                   InputProps={{
                     inputComponent: TextMaskCustom,
                   }}
+                />
+              </Grid>
+
+              <Grid item xs={3}>
+                <TextField
+                  className={classes.containerInput}
+                  label="Cargo"
+                  value={this.state.contact.ocupation}
+                  onChange={this.handleChange('ocupation')}
+                  id="ocupation"
                 />
               </Grid>
               <Grid item xs={3}>
@@ -532,13 +544,13 @@ class User extends React.Component {
               </Grid>
               <Grid item xs={3}>
                 <TextField
-                  id="office"
+                  id="type"
                   select
-                  label="Cargo"
+                  label="Tipo de Empregado"
                   required
                   className={classes.containerInput}
-                  value={this.state.contact.office}
-                  onChange={this.handleChange('office')}
+                  value={this.state.contact.type}
+                  onChange={this.handleChange('type')}
                   SelectProps={{
                     native: false,
                     MenuProps: {
@@ -564,6 +576,27 @@ class User extends React.Component {
                   onChange={this.handleChange('crmv')}
                 />
               </Grid>
+              <Grid item xs={4} >
+                <TextField
+                  id="standard-password-input"
+                  label="Senha"
+                  className={classes.containerInput}
+                  required
+                  type="password"
+                  value={this.state.contact.password}
+                  autoComplete="current-password"
+                />
+              </Grid>
+
+              <Grid item xs={4} >
+                <TextField
+                  id="maritalStatus"
+                  label="Estado Civil"
+                  className={classes.containerInput}                
+                  value={this.state.contact.maritalStatus}
+                  autoComplete="marital-status"
+                />
+              </Grid>
               <Grid item xs={3} >
                 <TextField
                   id="zipCode"
@@ -578,7 +611,7 @@ class User extends React.Component {
                   }}
                 />
               </Grid>
-              <Grid item xs={9} >
+              <Grid item xs={6} >
                 <TextField
                   id="street"
                   label="Logradouro"
@@ -609,7 +642,7 @@ class User extends React.Component {
                 />
               </Grid>
 
-              <Grid item xs={6} >
+              <Grid item xs={4} >
                 <TextField
                   id="neighborhood"
                   label="Neighborhood"
@@ -637,21 +670,7 @@ class User extends React.Component {
                   value={this.state.address.states}
                   onChange={this.handleChangeAddress('states')}
                 />
-              </Grid>
-
-
-              <Grid item xs={4} >
-                <TextField
-                  id="standard-password-input"
-                  label="Senha"
-                  className={classes.containerInput}
-                  required
-                  type="password"
-                  value={this.state.contact.password}
-                  autoComplete="current-password"
-                  margin="normal"
-                />
-              </Grid>
+              </Grid>              
 
               <Grid item xs={9}></Grid>
               <Grid item xs={3}>

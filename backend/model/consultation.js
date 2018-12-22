@@ -1,13 +1,13 @@
-var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
 
-var ObjectId = mongoose.Schema.Types.ObjectId;
+module.exports = (sequelize, Sequelize) => {
+    const Consultation = sequelize.define('sales', {
+        totalValue: {
+            type: Sequelize.DECIMAL(10, 2)
+        },
+        dateSale: {
+            type: Sequelize.DATE
+        }
+    });
 
-var consultation = new Schema({
-    _id: ObjectId,
-    name: String,
-    value: Number,
-    amount: Number
-});
-
-module.exports = consultation;
+    return Sale;
+}

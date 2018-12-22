@@ -1,33 +1,53 @@
-var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
 
-var address = require('./address');
+module.exports = (sequelize, Sequelize) => {
+    const User = sequelize.define('users', {
+        name: {
+            type: Sequelize.STRING
+        },
+        username: {
+            type: Sequelize.STRING,unique: true
+        },
+        registerCode: {
+            type: Sequelize.STRING, unique: true
+        },
+        nacionality: {
+            type: Sequelize.STRING
+        },
+        dateBirth: {
+            type: Sequelize.DATE
+        },
+        maritalStatus: {
+            type: Sequelize.STRING
+        },
+        sex: {
+            type: Sequelize.STRING
+        },
+        crmv: {
+            type: Sequelize.STRING
+        },
+        comission: {
+            type: Sequelize.DOUBLE
+        },
+        salary: {
+            type: Sequelize.DECIMAL(10, 2)
+        },
+        phone: {
+            type: Sequelize.STRING
+        },
+        phone1: {
+            type: Sequelize.STRING
+        },
+        email: {
+            type: Sequelize.STRING,unique: true
+        },
+        password: {
+            type: Sequelize.STRING
+        },
+        officer: {
+            type:
+                Sequelize.ENUM('C', 'S', 'V', 'A')
+        }
+    });
 
-var ObjectId = mongoose.Schema.Types.ObjectId;
-
-var user = new Schema({
-    _id: ObjectId,
-    name:  { type: String, required: true },
-    username:  { type: String, required: true, unique:true },
-    registerCode: {type: String, unique:true , required: true },
-    date_birth:   {type: Date, required: true},
-    hash: { type: String, required: true },
-    password: { type: String },
-    email: String,
-    telephone1: {type: String, required: true },
-    telephone2: String,   
-    telephone3: String,
-    crmv:  String,
-    commission: Number,
-    nacionality: String,
-    marital_status: {type: String, required: true },
-    sex: String,
-    ocupation: String,
-    salary: Number,
-    type: { type: String, required: true ,enum : ['C','A','V','S']},
-    address: [address]
-});
-user.set('toJSON', { virtuals: true });
-
-
-module.exports = user;
+    return User;
+}

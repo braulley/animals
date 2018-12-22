@@ -1,21 +1,25 @@
-var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
 
-var user = require('./user');
+module.exports = (sequelize, Sequelize) => {
+    const Pet = sequelize.define('pets', {
+        name: {
+            type: Sequelize.STRING
+        },
+        breed: {
+            type: Sequelize.STRING
+        },
+        weight: {
+            type: Sequelize.STRING
+        },
+        height: {
+            type: Sequelize.STRING
+        },
+        typeOfAnimal : {
+            type: Sequelize.STRING
+        },
+        observation: {
+            type: Sequelize.STRING
+        }
+    });
 
-var ObjectId = mongoose.Schema.Types.ObjectId;
-
-var pet = new Schema({
-    _id: ObjectId,
-    name:  { type: String, required: true },
-    type:  { type: String, required: true },
-    description: String,
-    observation: String,
-    heigth: Number,
-    width: Number,
-    weigth:   Number,
-    breed: String,
-    user: [user]
-});
-
-module.exports = pet;
+    return Pet;
+}

@@ -1,19 +1,31 @@
-var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
 
-var ObjectId = mongoose.Schema.Types.ObjectId;
+module.exports = (sequelize, Sequelize) => {
+    const Address = sequelize.define('addresses', {
+        street: {
+            type: Sequelize.STRING
+        },
+        number: {
+            type: Sequelize.INTEGER
+        },
+        zipCode: {
+            type: Sequelize.STRING
+        },
+        complement: {
+            type: Sequelize.STRING
+        },
+        neighborhood: {
+            type: Sequelize.STRING
+        },
+        city: {
+            type: Sequelize.STRING
+        },
+        state: {
+            type: Sequelize.STRING
+        },
+        local: {
+            type: Sequelize.STRING
+        }
+    });
 
-var address = new Schema({
-    _id: ObjectId,
-    street:  { type: String, required: true },
-    Number: {type: Number, required: true },
-    zipCode:   {type: String, required: true},
-    complement: String,    
-    neighborhood:  String,
-    city: {type: String, required: true},
-    state: {type: String, required: true},
-    coutry: {type: String, required: true},
-    create_at: { type: Date, default: Date.now }
-});
-
-module.exports = address;
+    return Address;
+}
