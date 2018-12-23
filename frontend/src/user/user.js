@@ -376,7 +376,7 @@ class User extends React.Component {
       contact: this.state.contact,
       address: this.state.address
     }
-    axios.post(`http://localhost:4000/users/register`, { user })
+    axios.post(`http://localhost:4000/users/signup`, { user })
       .then(res => {
         console.log(res);
         console.log(res.data);
@@ -585,6 +585,7 @@ class User extends React.Component {
                   type="password"
                   value={this.state.contact.password}
                   autoComplete="current-password"
+                  onChange={this.handleChange('password')}
                 />
               </Grid>
 
@@ -595,6 +596,8 @@ class User extends React.Component {
                   className={classes.containerInput}                
                   value={this.state.contact.maritalStatus}
                   autoComplete="marital-status"
+                  onChange={this.handleChange('maritalStatus')}
+
                 />
               </Grid>
               <Grid item xs={3} >

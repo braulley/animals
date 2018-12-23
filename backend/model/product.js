@@ -7,9 +7,6 @@ module.exports = (sequelize, Sequelize) => {
         value: {
             type: Sequelize.DECIMAL(10, 2) 
         },
-        amount: {
-            type: Sequelize.STRING
-        }
     });
 
     return Product;
