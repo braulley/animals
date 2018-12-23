@@ -5,10 +5,13 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.STRING
         },
         username: {
-            type: Sequelize.STRING,unique: true
+            type: Sequelize.STRING
         },
         registerCode: {
-            type: Sequelize.STRING, unique: true
+            type: Sequelize.STRING
+        },
+        hash: {
+            type: Sequelize.STRING
         },
         nacionality: {
             type: Sequelize.STRING
@@ -38,7 +41,7 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.STRING
         },
         email: {
-            type: Sequelize.STRING,unique: true
+            type: Sequelize.STRING,
         },
         password: {
             type: Sequelize.STRING
