@@ -63,6 +63,11 @@ app.use(function (err, req, res, next) {
 /*db.sequelize.sync({force: true}).then(() => {
   console.log('Drop and Resync with { force: true }');
 });*/
+/*db.sequelize.sync({ force: true }).then(data => {
+}).catch(err =>{
+  console.log(err);
+});*/
+
 db.sequelize
   .authenticate()
   .then(() => {

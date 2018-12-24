@@ -2,8 +2,8 @@
 const Sequelize = require('sequelize');
 require('dotenv').config()
 
-const sequelize = new Sequelize('sql9270537','sql9270537', 'LZf7enr4pa', {
-  host: 'sql9.freemysqlhosting.net',
+const sequelize = new Sequelize('animals_database','root', '', {
+  host: 'localhost',
   dialect: 'mysql',
   operatorsAliases: false,
  
