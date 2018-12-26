@@ -67,12 +67,13 @@ function signup(req, res) {
 
 function signin(req, res) {
 	console.log("Sign-In");
-
+	console.log(req.body);
 	User.findOne({
 		where: {
 			username: req.body.username
 		}
 	}).then(user => {
+		console.log(user);
 		if (!user) {
 			return res.status(404).send('User Not Found.');
 		}
