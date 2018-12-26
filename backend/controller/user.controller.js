@@ -8,6 +8,7 @@ var cors = require('cors');
 var jwt = require('jsonwebtoken');
 var bcrypt = require('bcryptjs');
 const verifySignUp = require('../routes/verifySignUp.js');
+const verifyToken = require('../routes/verifyJwtToken.js');
 
 router.post('/signup', [verifySignUp.checkDuplicateUserNameOrEmail], signup);
 router.post('/signin', signin);

@@ -12,6 +12,8 @@ import LockIcon from '@material-ui/icons/LockOutlined'
 import Paper from '@material-ui/core/Paper'
 import Typography from '@material-ui/core/Typography'
 import withStyles from '@material-ui/core/styles/withStyles'
+import { Redirect } from 'react-router'
+import { Route } from 'react-router-dom'
 import axios from 'axios'
 
 const styles = theme => ({
@@ -50,7 +52,7 @@ class App extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { user : {username: '', password: '' }};
+    this.state = { user : {username: '', password: '' }, userError: false};
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -68,10 +70,21 @@ class App extends React.Component {
     event.preventDefault();
     console.log(this.state.user)
 
-    axios.post(`http://localhost:4000/users/authentication`, this.state.user )
+    axios.post(`http://localhost:4000/users/signin`, this.state.user )
       .then(res => {
-        console.log(res);
-        console.log(res.data);
+        localStorage.setItem("token",res.data.accessToken);
+
+        if(localStorage.getItem("token")){
+          console.log('login')
+          return <Redirect to='/user' />
+        }          
+        else{
+          alert('Usuário ou Senha Inválida, tente novamente !!!')
+          return <Redirect to='/' />
+
+        }
+      }).catch(err =>{
+        alert('Erro --> ', err)
       })
   }
 
