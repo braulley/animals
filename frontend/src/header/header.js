@@ -7,33 +7,35 @@ import CssBaseline from '@material-ui/core/CssBaseline'
 import Toolbar from '@material-ui/core/Toolbar'
 import List from '@material-ui/core/List'
 import Typography from '@material-ui/core/Typography'
-import Divider from '@material-ui/core/Divider'
 import ListItem from '@material-ui/core/ListItem'
 import ListItemIcon from '@material-ui/core/ListItemIcon'
 import ListItemText from '@material-ui/core/ListItemText'
-import InboxIcon from '@material-ui/icons/MoveToInbox'
-import MailIcon from '@material-ui/icons/Mail'
-import Table from '@material-ui/core/Table'
-import TableBody from '@material-ui/core/TableBody'
-import TableCell from '@material-ui/core/TableCell'
-import TableHead from '@material-ui/core/TableHead'
-import TableRow from '@material-ui/core/TableRow'
-import Paper from '@material-ui/core/Paper'
+import FaceIcon from '@material-ui/icons/FaceOutlined'
+import PetIcon from '@material-ui/icons/PetsOutlined'
+import SupervisorIcon from '@material-ui/icons/SupervisorAccountOutlined'
+import ScheduleIcon from '@material-ui/icons/ScheduleOutlined'
+import LibraryIcon from '@material-ui/icons/LibraryAddOutlined'
+import AddIcon from '@material-ui/icons/AddOutlined'
+import ShoppingIcon from '@material-ui/icons/ShoppingCartSharp'
+import ListIcon from '@material-ui/icons/ListAltOutlined'
+import ShopCartIcon from '@material-ui/icons/ShoppingCartOutlined'
 import { Link } from 'react-router-dom'
 import Collapse from '@material-ui/core/Collapse'
-import DraftsIcon from '@material-ui/icons/Drafts'
-import SendIcon from '@material-ui/icons/Send'
 import ExpandLess from '@material-ui/icons/ExpandLess'
 import ExpandMore from '@material-ui/icons/ExpandMore'
-import StarBorder from '@material-ui/icons/StarBorder'
 import ListSubheader from '@material-ui/core/ListSubheader'
-
+import MenuItem from '@material-ui/core/MenuItem'
+import Menu from '@material-ui/core/Menu'
+import IconButton from '@material-ui/core/IconButton'
+import AccountCircle from '@material-ui/icons/AccountCircle'
+import './header.css'
 
 const drawerWidth = 240;
 
 const styles = theme => ({
   appBar: {
     zIndex: theme.zIndex.drawer + 1,
+    flexGrow: 1,
   },
   drawer: {
     width: drawerWidth,
@@ -51,6 +53,10 @@ const styles = theme => ({
     maxWidth: 360,
     backgroundColor: theme.palette.background.paper,
   },
+  menuButton: {
+    marginLeft: -12,
+    marginRight: 20,
+  },
 });
 
 function ListItemLink(props) {
@@ -64,6 +70,8 @@ class Header extends React.Component {
     user: false,
     veterinary_consultation: false,
     product: false,
+    sales: false,
+    anchorEl: null,
   };
 
   handleClick(t, e) {
@@ -82,20 +90,62 @@ class Header extends React.Component {
     if (t == "product") {
       this.setState(state => ({ product: !state.product }));
     }
+    if (t == "sale") {
+      this.setState(state => ({ sales: !state.sales }));
+    }
+
   }
+
+  handleMenu = event => {
+    this.setState({ anchorEl: event.currentTarget });
+  };
+
+  handleClose = () => {
+    this.setState({ anchorEl: null });
+  };
 
 
 
   render() {
     const { classes } = this.props;
+    const { auth, anchorEl } = this.state;
+    const open = Boolean(anchorEl);
+
     return (
       <React.Fragment>
         <CssBaseline />
         <AppBar position="fixed" className={classes.appBar}>
           <Toolbar>
             <Typography variant="h6" color="inherit" noWrap>
-              Clínica Veterinária
+              Clínica São Judas
               </Typography>
+            <div className="floatRigh">
+              <IconButton
+                aria-owns={open ? 'menu-appbar' : undefined}
+                aria-haspopup="true"                
+                onClick={this.handleMenu}
+                color="inherit"
+              >
+                <AccountCircle />
+              </IconButton>
+              <Menu
+                id="menu-appbar"
+                anchorEl={anchorEl}
+                anchorOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                transformOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                open={open}
+                onClose={this.handleClose}
+              >
+                <MenuItem onClick={this.handleClose}>Profile</MenuItem>
+                <MenuItem onClick={this.handleClose}>My account</MenuItem>
+              </Menu>
+            </div>
           </Toolbar>
         </AppBar>
         <Drawer
@@ -106,11 +156,11 @@ class Header extends React.Component {
           }}
         >
           <div className={classes.toolbar} />
-          <List component="nav" subheader={<ListSubheader component="div">Nested List Items</ListSubheader>}
+          <List component="nav" subheader={<ListSubheader component="div">Clínica Veterinária e Petshop</ListSubheader>}
             className={classes.rootList}>
             <ListItem button onClick={(e) => this.handleClick('client', e)}>
               <ListItemIcon>
-                <InboxIcon />
+                <FaceIcon />
               </ListItemIcon>
               <ListItemText inset primary="Clientes" />
               {this.state.client ? <ExpandLess /> : <ExpandMore />}
@@ -120,7 +170,7 @@ class Header extends React.Component {
                 <Link to="/client">
                   <ListItem button className={classes.nested}>
                     <ListItemIcon>
-                      <StarBorder />
+                      <AddIcon />
                     </ListItemIcon>
                     <ListItemText inset primary="Cadastrar" />
                   </ListItem>
@@ -128,7 +178,7 @@ class Header extends React.Component {
                 <Link to="/clients">
                   <ListItem button className={classes.nested}>
                     <ListItemIcon>
-                      <StarBorder />
+                      <ListIcon />
                     </ListItemIcon>
                     <ListItemText inset primary="Lista de Clientes" />
                   </ListItem>
@@ -137,7 +187,7 @@ class Header extends React.Component {
             </Collapse>
             <ListItem button onClick={(e) => this.handleClick('pet', e)}>
               <ListItemIcon>
-                <InboxIcon />
+                <PetIcon />
               </ListItemIcon>
               <ListItemText inset primary="Pets" />
               {this.state.pet ? <ExpandLess /> : <ExpandMore />}
@@ -147,7 +197,7 @@ class Header extends React.Component {
                 <Link to="/pet">
                   <ListItem button className={classes.nested}>
                     <ListItemIcon>
-                      <StarBorder />
+                      <AddIcon />
                     </ListItemIcon>
                     <ListItemText inset primary="Cadastrar" />
                   </ListItem>
@@ -156,7 +206,7 @@ class Header extends React.Component {
                 <Link to="/pets">
                   <ListItem button className={classes.nested}>
                     <ListItemIcon>
-                      <StarBorder />
+                      <ListIcon />
                     </ListItemIcon>
                     <ListItemText inset primary="Lista de Pets" />
                   </ListItem>
@@ -167,7 +217,7 @@ class Header extends React.Component {
 
             <ListItem button onClick={(e) => this.handleClick('user', e)}>
               <ListItemIcon>
-                <InboxIcon />
+                <SupervisorIcon />
               </ListItemIcon>
               <ListItemText inset primary="Funcionários" />
               {this.state.user ? <ExpandLess /> : <ExpandMore />}
@@ -177,7 +227,7 @@ class Header extends React.Component {
                 <Link to="/user">
                   <ListItem button className={classes.nested}>
                     <ListItemIcon>
-                      <StarBorder />
+                      <AddIcon />
                     </ListItemIcon>
                     <ListItemText inset primary="Cadastrar" />
                   </ListItem>
@@ -185,7 +235,7 @@ class Header extends React.Component {
                 <Link to="/users">
                   <ListItem button className={classes.nested}>
                     <ListItemIcon>
-                      <StarBorder />
+                      <ListIcon />
                     </ListItemIcon>
                     <ListItemText inset primary="Lista de Usuários" />
                   </ListItem>
@@ -195,7 +245,7 @@ class Header extends React.Component {
 
             <ListItem button onClick={(e) => this.handleClick('veterinary_consultation', e)}>
               <ListItemIcon>
-                <InboxIcon />
+                <ScheduleIcon />
               </ListItemIcon>
               <ListItemText inset primary="Consultas" />
               {this.state.veterinary_consultation ? <ExpandLess /> : <ExpandMore />}
@@ -205,7 +255,7 @@ class Header extends React.Component {
                 <Link to="/veterinary_consultation">
                   <ListItem button className={classes.nested}>
                     <ListItemIcon>
-                      <StarBorder />
+                      <AddIcon />
                     </ListItemIcon>
                     <ListItemText inset primary="Registrar Consultas" />
                   </ListItem>
@@ -213,7 +263,7 @@ class Header extends React.Component {
                 <Link to="/veterinary_consultations">
                   <ListItem button className={classes.nested}>
                     <ListItemIcon>
-                      <StarBorder />
+                      <ListIcon />
                     </ListItemIcon>
                     <ListItemText inset primary="Lista de Consultas" />
                   </ListItem>
@@ -224,7 +274,7 @@ class Header extends React.Component {
 
             <ListItem button onClick={(e) => this.handleClick('product', e)}>
               <ListItemIcon>
-                <InboxIcon />
+                <LibraryIcon />
               </ListItemIcon>
               <ListItemText inset primary="Produtos" />
               {this.state.product ? <ExpandLess /> : <ExpandMore />}
@@ -234,7 +284,7 @@ class Header extends React.Component {
                 <Link to="/product">
                   <ListItem button className={classes.nested}>
                     <ListItemIcon>
-                      <StarBorder />
+                      <AddIcon />
                     </ListItemIcon>
                     <ListItemText inset primary="Cadastrar" />
                   </ListItem>
@@ -243,7 +293,7 @@ class Header extends React.Component {
                 <Link to="/products">
                   <ListItem button className={classes.nested}>
                     <ListItemIcon>
-                      <StarBorder />
+                      <ListIcon />
                     </ListItemIcon>
                     <ListItemText inset primary="Lista de Produtos" />
                   </ListItem>
@@ -251,17 +301,37 @@ class Header extends React.Component {
 
               </List>
             </Collapse>
-          </List>
 
 
-          <Divider />
-          <List component="nav">
-            <ListItemLink href="/sales">
-              <ListItemText primary="Venda" />
-            </ListItemLink>
-            <ListItemLink href="/salesDone">
-              <ListItemText primary="Registro de Venda" />
-            </ListItemLink>
+            <ListItem button onClick={(e) => this.handleClick('sale', e)}>
+              <ListItemIcon>
+                <ShopCartIcon />
+              </ListItemIcon>
+              <ListItemText inset primary="Vendas" />
+              {this.state.sales ? <ExpandLess /> : <ExpandMore />}
+            </ListItem>
+            <Collapse in={this.state.sales} timeout="auto" unmountOnExit>
+              <List component="div" disablePadding>
+                <Link to="/sale">
+                  <ListItem button className={classes.nested}>
+                    <ListItemIcon>
+                      <ShoppingIcon />
+                    </ListItemIcon>
+                    <ListItemText inset primary="Nova Venda" />
+                  </ListItem>
+                </Link>
+
+                <Link to="/salesDone">
+                  <ListItem button className={classes.nested}>
+                    <ListItemIcon>
+                      <ListIcon />
+                    </ListItemIcon>
+                    <ListItemText inset primary="Registros de Vendas" />
+                  </ListItem>
+                </Link>
+
+              </List>
+            </Collapse>
           </List>
         </Drawer>
       </React.Fragment>

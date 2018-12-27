@@ -76,12 +76,10 @@ class App extends React.Component {
 
         if(localStorage.getItem("token")){
           console.log('login')
-          return <Redirect to='/user' />
+          window.location.href="/user"
         }          
         else{
           alert('Usuário ou Senha Inválida, tente novamente !!!')
-          return <Redirect to='/' />
-
         }
       }).catch(err =>{
         alert('Erro --> ', err)
