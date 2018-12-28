@@ -46,7 +46,7 @@ module.exports = (sequelize, Sequelize) => {
         password: {
             type: Sequelize.STRING
         },
-        officer: {
+        type: {
             type:
                 Sequelize.ENUM('C', 'S', 'V', 'A')
         }

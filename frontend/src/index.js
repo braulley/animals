@@ -15,6 +15,7 @@ import Products from './products/products'
 import Product from './product/product'
 import SalesDone from './salesDone/salesDone'
 import Sales from './sales/sales'
+import Dashboard from './dashboard/dashboard'
 import { BrowserRouter, Switch, Route } from 'react-router-dom'
 
 ReactDOM.render(
@@ -33,6 +34,7 @@ ReactDOM.render(
             <Route path="/product" component={Product} />
             <Route path="/salesDone" component={SalesDone} />
             <Route path="/sales" component={Sales} />
+            <Route path="/dashboard" component={Dashboard} />
         </Switch>
     </ BrowserRouter>
     , document.getElementById('root'));

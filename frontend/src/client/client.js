@@ -25,6 +25,9 @@ import Select from '@material-ui/core/Select'
 import FormControl from '@material-ui/core/FormControl'
 import MenuItem from '@material-ui/core/MenuItem'
 import ViaCep from '../service/viaCep'
+import Icon from '@material-ui/core/Icon'
+import SaveIcon from '@material-ui/icons/Save'
+import classNames from 'classnames'
 
 
 const styles = theme => ({
@@ -142,68 +145,72 @@ function getStepContent(step) {
 
 class Client extends React.Component {
 
-  state = {
-    contact: {
-      name: '',
-      registerCode: '',
-      nacionality: '',
-      dateBirth: Date(),
-      office: '',
-      email: '',
-      phone: '',
-      phone1: '',
-      phone2: '',
-      sex: '',
-    },
-    address: {
-      street: '',
-      number: 0,
-      complement: '',
-      neighborhood: '',
-      city: '',
-      states: '',
-      country: '',
+  constructor(props){
+    super(props);
 
+    this.state = {
+      contact: {
+        name: '',
+        registerCode: '',
+        nacionality: '',
+        dateBirth:'',
+        office: '',
+        email: '',
+        phone: '',
+        phone1: '',
+        phone2: '',
+        sex: '',
+        maritalStatus: '',
+      },
+      address: {
+        street: '',
+        number: 0,
+        complement: '',
+        neighborhood: '',
+        city: '',
+        states: '',
+        country: '',
+        zipCode: '',
+      }
+    };
+
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleBlur = this.handleBlur.bind(this);
+  }
+
+  handleSubmit(event) {
+    event.preventDefault();
+    alert('HELLO')
+
+  }
+
+  handleChange = name => event => {
+    let user = this.state.contact
+    user[name] = event.target.value
+    this.setState({contact: user})
+  }
+
+  handleChangeAddredd = name => event => {
+    let address = this.state.address
+    address[name] = event.target.value
+    this.setState({address : address})
+  }
+
+  handleBlur() {
+    if (this.state.address.zipCode != '') {
+      let address = Object.assign({}, this.state.address)
+      ViaCep.getByCep(this.state.address.zipCode)
+        .then(res => {
+          address.neighborhood = res.bairro
+          address.city = res.localidade
+          address.street = res.logradouro
+          address.states = res.uf
+          this.setState({ address: address })
+        }).catch(err => {
+          alert(err);
+        })
     }
-  };
-
-  totalSteps = () => {
-    return getSteps().length;
-  };
-
-  handleNext = () => {
-    this.setState(state => ({
-      activeStep: state.activeStep + 1,
-    }));
-  };
-
-  handleBack = () => {
-    this.setState(state => ({
-      activeStep: state.activeStep - 1,
-    }));
-  };
-
-  handleReset = () => {
-    this.setState({
-      activeStep: 0,
-    });
-  };
-
-  handleStep = step => () => {
-    this.setState({
-      activeStep: step,
-    });
-  };
-
-  handleComplete = () => {
-    const { completed } = this.state;
-    completed[this.state.activeStep] = true;
-    this.setState({
-      completed,
-    });
-    this.handleNext();
-  };
-
+  }
 
   completedSteps() {
     return Object.keys(this.state.completed).length;
@@ -230,7 +237,7 @@ class Client extends React.Component {
         <Header />
         <main className={classes.content}>
           <div className={classes.toolbar} />
-          <form noValidate autoComplete="off">
+          <form noValidate autoComplete="off" onSubmit={this.handleSubmit}>
             <Grid container spacing={24}>
               <Grid item xs={12}>
                 <Typography variant="h4" gutterBottom>Cadastro de Clientes</Typography>
@@ -242,7 +249,7 @@ class Client extends React.Component {
                   label="Name"
                   className={classes.textField}
                   value={this.state.contact.name}
-                  margin="normal"
+                  onChange={this.handleChange('name')}                  
                 />
               </Grid>
               <Grid item xs={5}>
@@ -250,8 +257,8 @@ class Client extends React.Component {
                   id="cpf"
                   label="CPF"
                   className={classes.textField}
-                  value={this.state.contact.registerCode}
-                  margin="normal"
+                  value={this.state.contact.registerCode}  
+                  onChange={this.handleChange('registerCode')}                            
                 />
               </Grid>
               <Grid item xs={5}>
@@ -260,32 +267,37 @@ class Client extends React.Component {
                   label="Nacionalidade"
                   className={classes.textField}
                   value={this.state.contact.nacionality}
-                  margin="normal"
+                  onChange={this.handleChange('nacionality')}                                    
                 />
               </Grid>
               <Grid item xs={4} >
                 <TextField
                   id="birth"
                   label="Data de Nascimento"
+                  value={this.state.contact.dateBirth}              
+                  type="date"
+                  defaultValue="2017-05-24"
                   className={classes.textField}
-                  value={this.state.contact.dateBirth}
-                  margin="normal"
+                  onChange={this.handleChange('dateBirth')}                  
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
                 />
               </Grid>
               <Grid item xs={3}>
                 <TextField
                   id="standard-select-currency"
                   select
-                  label="Select"
+                  label="Sexo"
                   className={classes.textField}
-                  value={this.state.contact.sex }
+                  value={this.state.contact.sex}
                   SelectProps={{
                     MenuProps: {
                       className: classes.menu,
                     },
                   }}
-                  helperText="Please select your currency"
-                  margin="normal"
+                  helperText="Selecione o sexo"
+                  onChange={this.handleChange('sex')}                  
                 >
                   {sexArray.map(option => (
                     <MenuItem key={option.value} value={option.value}>
@@ -294,67 +306,59 @@ class Client extends React.Component {
                   ))}
                 </TextField>
               </Grid>
-              <Grid item xs={4}>
-                <TextField
-                  id="office"
-                  label="Cargo"
-                  className={classes.textField}
-                  value={this.state.contact.office}
-                  margin="normal"
-                />
-              </Grid>
-              <Grid item xs={8}>
+              <Grid item xs={6}>
                 <TextField
                   id="email"
                   label="Email"
                   className={classes.textField}
                   value={this.state.contact.email}
-                  margin="normal"
+                  onChange={this.handleChange('email')}                                    
                 />
               </Grid>
-              <Grid item xs={4}>
+              <Grid item xs={3}>
                 <TextField
                   id="tel"
                   label="Celular"
                   className={classes.textField}
                   value={this.state.contact.phone}
-                  margin="normal"
+                  onChange={this.handleChange('phone')}                                   
                 />
               </Grid>
-              <Grid item xs={4}>
+              <Grid item xs={3}>
                 <TextField
                   id="tel1"
                   label="Residencial"
                   className={classes.textField}
                   value={this.state.contact.phone1}
-                  margin="normal"
+                  onChange={this.handleChange('phone1')}                                   
                 />
               </Grid>
               <Grid item xs={4}>
                 <TextField
-                  id="tel2"
-                  label="Tel.COmercial"
+                  id="maritalStatus"
+                  label="Estado Civil"
                   className={classes.textField}
-                  value={this.state.contact.phone2}
-                  margin="normal"
+                  value={this.state.contact.maritalStatus}
+                  onChange={this.handleChange('maritalStatus')}                                   
                 />
-              </Grid>
-              <Grid item xs={4}>
-                <TextField
-                  id="cep"
-                  label="CEP"
-                  className={classes.textField}
-                  value={this.state.zipCode}
-                  margin="normal"
-                />
-              </Grid>
+              </Grid>              
               <Grid item xs={8}>
                 <TextField
                   id="street"
                   label="Logradouro"
                   className={classes.textField}
                   value={this.state.address.street}
-                  margin="normal"
+                  onChange={this.handleChangeAddredd('street')}                                  
+                />
+              </Grid>
+              <Grid item xs={5}>
+                <TextField
+                  id="cep"
+                  label="CEP"
+                  className={classes.textField}
+                  value={this.state.address.zipCode}
+                  onChange={this.handleChangeAddredd('zipCode')} 
+                  onBlur={this.handleBlur}
                 />
               </Grid>
               <Grid item xs={3}>
@@ -363,7 +367,7 @@ class Client extends React.Component {
                   label="Número"
                   className={classes.textField}
                   value={this.state.address.number}
-                  margin="normal"
+                  onChange={this.handleChangeAddredd('number')}                                    
                 />
               </Grid>
               <Grid item xs={4}>
@@ -371,17 +375,17 @@ class Client extends React.Component {
                   id="complement"
                   label="Complemento"
                   className={classes.textField}
-                  value={this.state.address.complement}
-                  margin="normal"
+                  value={this.state.address.complement} 
+                  onChange={this.handleChangeAddredd('complement')}                                   
                 />
               </Grid>
-              <Grid item xs={5}>
+              <Grid item xs={4}>
                 <TextField
                   id="neighborhood"
                   label="Bairro"
                   className={classes.textField}
                   value={this.state.address.neighborhood}
-                  margin="normal"
+                  onChange={this.handleChangeAddredd('neighborhood')}                                   
                 />
               </Grid>
 
@@ -391,8 +395,8 @@ class Client extends React.Component {
                   id="city"
                   label="Cidade"
                   className={classes.textField}
-                  value={this.state.address.city}
-                  margin="normal"
+                  value={this.state.address.city} 
+                  onChange={this.handleChangeAddredd('city')}                                   
                 />
               </Grid>
 
@@ -401,23 +405,16 @@ class Client extends React.Component {
                   id="state"
                   label="Estado"
                   className={classes.textField}
-                  value={this.state.address.states}
-                  margin="normal"
+                  value={this.state.address.states}  
+                  onChange={this.handleChangeAddredd('states')}                                  
                 />
               </Grid>
-
-              <Grid item xs={4}>
-                <TextField
-                  id="country"
-                  label="País"
-                  className={classes.textField}
-                  value={this.state.address.country}
-                  margin="normal"
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <Button variant="outlined" color="primary" className={classes.button}>
-                  Primary
+              <Grid item xs={5}></Grid>
+              <Grid item xs={5}></Grid>
+              <Grid item xs={2}>
+                <Button variant="outlined" type="submit" color="primary" className={classes.button}>
+                  <SaveIcon className={classNames(classes.leftIcon, classes.iconSmall)} />
+                  Salvar
       </Button>
               </Grid>
             </Grid>

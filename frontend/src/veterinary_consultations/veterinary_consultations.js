@@ -15,6 +15,7 @@ import Icon from '@material-ui/core/Icon'
 import DeleteIcon from '@material-ui/icons/Delete'
 import NavigationIcon from '@material-ui/icons/Navigation'
 import { Link } from 'react-router-dom'
+import Typography from '@material-ui/core/Typography'
 
 
 const styles = theme => ({

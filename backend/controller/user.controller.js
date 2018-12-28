@@ -52,7 +52,7 @@ function signup(req, res) {
 			phone1: contact.phone1,
 			email: contact.email,
 			password: bcrypt.hashSync(contact.password, 8),
-			officer: contact.type,
+			type: contact.type,
 			address_id: idAddress,
 		}).then(user => {
 			console.log(user);

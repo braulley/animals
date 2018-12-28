@@ -76,7 +76,7 @@ class App extends React.Component {
 
         if(localStorage.getItem("token")){
           console.log('login')
-          window.location.href="/user"
+          window.location.href="/dashboard"
         }          
         else{
           alert('Usuário ou Senha Inválida, tente novamente !!!')
