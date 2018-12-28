@@ -28,7 +28,7 @@ import ViaCep from '../service/viaCep'
 import Icon from '@material-ui/core/Icon'
 import SaveIcon from '@material-ui/icons/Save'
 import classNames from 'classnames'
-
+import axios from 'axios'
 
 const styles = theme => ({
   root: {
@@ -154,7 +154,7 @@ class Client extends React.Component {
         registerCode: '',
         nacionality: '',
         dateBirth:'',
-        office: '',
+        type: 'C',
         email: '',
         phone: '',
         phone1: '',
@@ -171,6 +171,7 @@ class Client extends React.Component {
         states: '',
         country: '',
         zipCode: '',
+        local: '',
       }
     };
 
@@ -180,8 +181,16 @@ class Client extends React.Component {
 
   handleSubmit(event) {
     event.preventDefault();
-    alert('HELLO')
-
+    let user = {
+      contact: this.state.contact,
+      address: this.state.address
+    }
+    axios.post(`http://localhost:4000/users/signup`, { user })
+      .then(res => {
+        console.log(res);
+        console.log(res.data);
+      })
+      
   }
 
   handleChange = name => event => {
@@ -212,22 +221,9 @@ class Client extends React.Component {
     }
   }
 
-  completedSteps() {
-    return Object.keys(this.state.completed).length;
-  }
-
-  isLastStep() {
-    return this.state.activeStep === this.totalSteps() - 1;
-  }
-
-  allStepsCompleted() {
-    return this.completedSteps() === this.totalSteps();
-  }
 
   render() {
-    const steps = getSteps()
     const { activeStep } = this.state
-
 
     const { handleSubmit, pristine, reset, submitting, classes } = this.props
 

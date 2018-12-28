@@ -10,10 +10,11 @@ var bcrypt = require('bcryptjs');
 const verifySignUp = require('../routes/verifySignUp.js');
 const verifyToken = require('../routes/verifyJwtToken.js');
 
+router.get('/', getAll);
 router.post('/signup', [verifySignUp.checkDuplicateUserNameOrEmail], signup);
 router.post('/signin', signin);
-router.get('/', getAll);
 router.get('/getId:userId', getById);
+router.get('/userClient', getUserClient);
 router.put(`/update:userId`, update);
 router.delete(`/remove:userId`, _delete);
 
@@ -24,7 +25,8 @@ function signup(req, res) {
 	console.log("Processing func -> SignUp");
 	let address = req.body.user.address;
 	let contact = req.body.user.contact;
-
+	console.log(address)
+	console.log(contact)
 	Address.create({
 		street: address.street,
 		number: address.number,
@@ -32,26 +34,26 @@ function signup(req, res) {
 		complement: address.complement,
 		neighborhood: address.neighborhood,
 		city: address.city,
-		state: address.state,
+		state: address.states,
 		local: address.local,
 	}).then(data => {
 		let idAddress = parseInt(data.dataValues.id);
 		console.log('COntact', contact);
 		User.create({
 			name: contact.name,
-			username: contact.userName,
+			username: contact.userName ? contact.userName : null,
 			registerCode: contact.registerCode,
 			nacionality: contact.nacionality,
 			dateBirth: Date(contact.dateBirth),
 			maritalStatus: contact.maritalStatus,
 			sex: contact.sex,
-			crmv: contact.crmv,
-			comission: parseFloat(contact.comission).toFixed(2),
-			salary: parseFloat(contact.salary).toFixed(2),
+			crmv: contact.crmv ? contact.crmv : null,
+			comission: contact.comission ? parseFloat(contact.comission).toFixed(2) : null,
+			salary: contact.salary ? parseFloat(contact.salary).toFixed(2) : null,
 			phone: contact.phone,
 			phone1: contact.phone1,
 			email: contact.email,
-			password: bcrypt.hashSync(contact.password, 8),
+			password: contact.password ? bcrypt.hashSync(contact.password, 8) : null,
 			type: contact.type,
 			address_id: idAddress,
 		}).then(user => {
@@ -109,6 +111,19 @@ async function getById(req, res, next) {
 	}).catch(err => {
 		res.status(500).send('Error -> ' + err);
 	});
+}
+
+async function getUserClient(req, res, next) {
+	await User.findAndCountAll({
+			where: { type: 'C' },
+			//offset: 10,
+			//limit: 2
+		}).then(result => {
+			console.log('getUserClient', req.query);
+			res.status(200).json(result);
+		}).catch(err => {
+			res.status(500).send('Error ->' , err);
+		});
 }
 
 async function update(req, res, next) {
