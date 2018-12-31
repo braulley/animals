@@ -1,34 +1,21 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { withStyles } from '@material-ui/core/styles'
-import Stepper from '@material-ui/core/Stepper'
-import Step from '@material-ui/core/Step'
-import StepButton from '@material-ui/core/StepButton'
 import Button from '@material-ui/core/Button'
 import Typography from '@material-ui/core/Typography'
 import Grid from '@material-ui/core/Grid'
 import Header from '../header/header'
-import Input from '@material-ui/core/Input'
-import Card from '@material-ui/core/Card'
-import CardActionArea from '@material-ui/core/CardActionArea'
-import CardActions from '@material-ui/core/CardActions'
-import CardContent from '@material-ui/core/CardContent'
-import CardMedia from '@material-ui/core/CardMedia'
-import InputLabel from '@material-ui/core/InputLabel'
-import FormHelperText from '@material-ui/core/FormHelperText'
 import TextField from '@material-ui/core/TextField'
-import StepLabel from '@material-ui/core/StepLabel'
-import AccountCircle from '@material-ui/icons/AccountCircle'
 import Divider from '@material-ui/core/Divider'
 import './client.css'
-import Select from '@material-ui/core/Select'
-import FormControl from '@material-ui/core/FormControl'
 import MenuItem from '@material-ui/core/MenuItem'
 import ViaCep from '../service/viaCep'
-import Icon from '@material-ui/core/Icon'
 import SaveIcon from '@material-ui/icons/Save'
 import classNames from 'classnames'
 import axios from 'axios'
+import MaskedInput from 'react-text-mask'
+import * as cpf from '@fnando/cpf'
+import { Link } from 'react-router-dom'
 
 const styles = theme => ({
   root: {
@@ -124,23 +111,69 @@ const validate = values => {
 }
 
 
-function getSteps() {
-  return ['Dados Pessoais', 'Contato', 'Endereço', 'Finalizar'];
+
+function Phone(props) {
+  const { inputRef, ...other } = props;
+
+  return (
+    <MaskedInput
+      {...other}
+      ref={ref => {
+        inputRef(ref ? ref.inputElement : null);
+      }}
+      mask={['(', /[1-9]/, /\d/, ')', ' ', /\d/,/\d/,/\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
+      placeholderChar={'\u2000'}
+      showMask
+    />
+  );
 }
 
-function getStepContent(step) {
-  switch (step) {
-    case 0:
-      return 'Step 1: Select campaign settings...';
-    case 1:
-      return 'Step 2: What is an ad group anyways?';
-    case 2:
-      return 'Step 3: This is the bit I really care about!';
-    case 3:
-      return 'Step 4: FInally';
-    default:
-      return 'Unknown step';
-  }
+function Phone1(props) {
+  const { inputRef, ...other } = props;
+
+  return (
+    <MaskedInput
+      {...other}
+      ref={ref => {
+        inputRef(ref ? ref.inputElement : null);
+      }}
+      mask={['(', /[1-9]/, /\d/, ')', ' ', /\d/, /\d/, /\d/,/\d/, '-', /\d/, /\d/, /\d/, /\d/]}
+      placeholderChar={'\u2000'}
+      showMask
+    />
+  );
+}
+
+function RegisterCode(props) {
+  const { inputRef, ...other } = props;
+
+  return (
+    <MaskedInput
+      {...other}
+      ref={ref => {
+        inputRef(ref ? ref.inputElement : null);
+      }}
+      mask={[ /\d/, /\d/, /\d/, '.', /\d/, /\d/, /\d/,'.',  /\d/, /\d/, /\d/,'-', /\d/, /\d/,]}
+      placeholderChar={'\u2000'}
+      showMask
+    />
+  );
+}
+
+function zipCode(props) {
+  const { inputRef, ...other } = props;
+
+  return (
+    <MaskedInput
+      {...other}
+      ref={ref => {
+        inputRef(ref ? ref.inputElement : null);
+      }}
+      mask={[/[1-9]/, /\d/, /\d/, /\d/, /\d/,'-',  /\d/, /\d/, /\d/,]}
+      placeholderChar={'\u2000'}
+      showMask
+    />
+  );
 }
 
 class Client extends React.Component {
@@ -172,31 +205,60 @@ class Client extends React.Component {
         country: '',
         zipCode: '',
         local: '',
-      }
+      },
+      validationError: true,
     };
-
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleBlur = this.handleBlur.bind(this);
   }
 
-  handleSubmit(event) {
-    event.preventDefault();
-    let user = {
-      contact: this.state.contact,
-      address: this.state.address
-    }
-    axios.post(`http://localhost:4000/users/signup`, { user })
-      .then(res => {
-        console.log(res);
-        console.log(res.data);
-      })
-      
+
+  clear (){
+    let clearData = Object.assign({}, this.state.contact)
+    let clearAddress = Object.assign({}, this.state.address)
+    clearData.name = ''
+    clearData.registerCode = ''
+    clearData.nacionality = ''
+    clearData.phone = ''
+    clearData.phone1 = ''
+    clearData.sex = ''
+    clearData.type = ''
+    clearData.maritalStatus = ''
+    clearData.email = ''
+    clearData.dateBirth = new Date()
+    this.setState((state) => ({contact: clearData }) )
+    clearAddress.zipCode = ''
+    clearAddress.street = ' '
+    clearAddress.neighborhood = ''
+    clearAddress.states = ''
+    clearAddress.local = ''
+    clearAddress.number = 0
+    clearAddress.complement = ''
+    clearAddress.city = ''
+    this.setState((state) => ({contact: clearAddress}))
   }
+
+  handleSubmit(event) {
+    event.preventDefault();    
+
+      let user = {
+        contact: this.state.contact,
+        address: this.state.address
+      }
+      axios.post(`http://localhost:4000/users/signup`, { user })
+        .then(res => {
+          console.log(res);
+          console.log(res.data);
+          this.clear()
+        })          
+  }
+
 
   handleChange = name => event => {
     let user = this.state.contact
-    user[name] = event.target.value
-    this.setState({contact: user})
+    user[name] = event.target.value    
+    this.setState({contact: user}) 
+
   }
 
   handleChangeAddredd = name => event => {
@@ -245,7 +307,8 @@ class Client extends React.Component {
                   label="Name"
                   className={classes.textField}
                   value={this.state.contact.name}
-                  onChange={this.handleChange('name')}                  
+                  onChange={this.handleChange('name')}
+                  required                  
                 />
               </Grid>
               <Grid item xs={5}>
@@ -254,7 +317,11 @@ class Client extends React.Component {
                   label="CPF"
                   className={classes.textField}
                   value={this.state.contact.registerCode}  
-                  onChange={this.handleChange('registerCode')}                            
+                  onChange={this.handleChange('registerCode')} 
+                  InputProps={{
+                    inputComponent: RegisterCode,
+                  }}
+                  required                           
                 />
               </Grid>
               <Grid item xs={5}>
@@ -278,6 +345,7 @@ class Client extends React.Component {
                   InputLabelProps={{
                     shrink: true,
                   }}
+                  required
                 />
               </Grid>
               <Grid item xs={3}>
@@ -308,7 +376,8 @@ class Client extends React.Component {
                   label="Email"
                   className={classes.textField}
                   value={this.state.contact.email}
-                  onChange={this.handleChange('email')}                                    
+                  onChange={this.handleChange('email')}
+                  required                                   
                 />
               </Grid>
               <Grid item xs={3}>
@@ -317,7 +386,11 @@ class Client extends React.Component {
                   label="Celular"
                   className={classes.textField}
                   value={this.state.contact.phone}
-                  onChange={this.handleChange('phone')}                                   
+                  onChange={this.handleChange('phone')}
+                  InputProps={{
+                    inputComponent: Phone,
+                  }}
+                  required                                    
                 />
               </Grid>
               <Grid item xs={3}>
@@ -326,7 +399,10 @@ class Client extends React.Component {
                   label="Residencial"
                   className={classes.textField}
                   value={this.state.contact.phone1}
-                  onChange={this.handleChange('phone1')}                                   
+                  onChange={this.handleChange('phone1')}
+                  InputProps={{
+                    inputComponent: Phone1,
+                  }}                                                         
                 />
               </Grid>
               <Grid item xs={4}>
@@ -355,6 +431,10 @@ class Client extends React.Component {
                   value={this.state.address.zipCode}
                   onChange={this.handleChangeAddredd('zipCode')} 
                   onBlur={this.handleBlur}
+                  InputProps={{
+                    inputComponent: zipCode,
+                  }}
+                  required
                 />
               </Grid>
               <Grid item xs={3}>
@@ -406,9 +486,21 @@ class Client extends React.Component {
                 />
               </Grid>
               <Grid item xs={5}></Grid>
-              <Grid item xs={5}></Grid>
+              <Grid item xs={3}></Grid>
               <Grid item xs={2}>
-                <Button variant="outlined" type="submit" color="primary" className={classes.button}>
+              <Button variant="outlined" 
+                color="secondary" 
+                onClick={this.clear}
+                className={classes.button} 
+                 component={Link} to="/clients">
+                  <SaveIcon className={classNames(classes.leftIcon, classes.iconSmall)} />
+                  Voltar
+      </Button>
+              </Grid>
+              <Grid item xs={2}>
+                <Button variant="outlined" type="submit" color="primary" 
+                className={classes.button}
+                disabled={false}>
                   <SaveIcon className={classNames(classes.leftIcon, classes.iconSmall)} />
                   Salvar
       </Button>

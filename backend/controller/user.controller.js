@@ -22,7 +22,6 @@ module.exports = router;
 
 function signup(req, res) {
 	// Save User to Database
-	console.log("Processing func -> SignUp");
 	let address = req.body.user.address;
 	let contact = req.body.user.contact;
 	console.log(address)
@@ -38,13 +37,13 @@ function signup(req, res) {
 		local: address.local,
 	}).then(data => {
 		let idAddress = parseInt(data.dataValues.id);
-		console.log('COntact', contact);
+		console.log('HEREIS',contact)
 		User.create({
 			name: contact.name,
 			username: contact.userName ? contact.userName : null,
 			registerCode: contact.registerCode,
 			nacionality: contact.nacionality,
-			dateBirth: Date(contact.dateBirth),
+			dateBirth: new Date(contact.dateBirth),
 			maritalStatus: contact.maritalStatus,
 			sex: contact.sex,
 			crmv: contact.crmv ? contact.crmv : null,
