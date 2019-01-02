@@ -24,8 +24,7 @@ function signup(req, res) {
 	// Save User to Database
 	let address = req.body.user.address;
 	let contact = req.body.user.contact;
-	console.log(address)
-	console.log(contact)
+
 	Address.create({
 		street: address.street,
 		number: address.number,
@@ -37,7 +36,6 @@ function signup(req, res) {
 		local: address.local,
 	}).then(data => {
 		let idAddress = parseInt(data.dataValues.id);
-		console.log('HEREIS',contact)
 		User.create({
 			name: contact.name,
 			username: contact.userName ? contact.userName : null,

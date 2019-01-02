@@ -15,6 +15,7 @@ import Icon from '@material-ui/core/Icon'
 import DeleteIcon from '@material-ui/icons/Delete'
 import NavigationIcon from '@material-ui/icons/Navigation'
 import { Link } from 'react-router-dom'
+import axios from 'axios'
 
 
 const styles = theme => ({
@@ -64,67 +65,87 @@ const rows = [
   createData('Gingerbread', 356, 16.0, 49, 3.9),
 ];
 
-function Pets(props) {
-  const { classes } = props;
+class Pets extends React.Component {
 
-  return (
-    <div className={classes.rootHeader}>
-      <Header />
-      <main className={classes.content}>
-        <div className={classes.toolbar} />        
-        <Grid container spacing={24}>
-          <Grid item xs={4}>
+  constructor(props){
+    super(props)
+    this.state = {
+      rows: []
+    }
+  }
+
+  componentDidMount() {
+    axios.get('http://localhost:4000/pets')
+      .then(res => {
+        console.log(res)
+      }).catch(err => {
+        console.log(err)
+      })
+  }
+  render() {
+    const { classes } = this.props;
+
+
+
+    return (
+      <div className={classes.rootHeader}>
+        <Header />
+        <main className={classes.content}>
+          <div className={classes.toolbar} />
+          <Grid container spacing={24}>
+            <Grid item xs={4}>
               <h2>Lista de Pets</h2>
+            </Grid>
+            <Grid item xs={4}></Grid>
+            <Grid item xs={1} >
+              <Link to="/pet">
+                <Fab color="primary" aria-label="Add" className={classes.fab}>
+                  <AddIcon />
+                </Fab>
+              </Link>
+            </Grid>
+            <Grid item xs={1}>
+              <Fab variant="extended" aria-label="Delete" className={classes.fab}>
+                <NavigationIcon className={classes.extendedIcon} />Filtro
+              </Fab>
+            </Grid>
+            <Grid item xs={2}>
+            </Grid>
+            <Grid item xs={12}>
+              <Paper className={classes.root}>
+                <Table className={classes.table}>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Dessert (100g serving)</TableCell>
+                      <TableCell >Calories</TableCell>
+                      <TableCell >Fat (g)</TableCell>
+                      <TableCell >Carbs (g)</TableCell>
+                      <TableCell >Protein (g)</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {rows.map(row => {
+                      return (
+                        <TableRow key={row.id}>
+                          <TableCell component="th" scope="row">
+                            {row.name}
+                          </TableCell>
+                          <TableCell >{row.calories}</TableCell>
+                          <TableCell >{row.fat}</TableCell>
+                          <TableCell >{row.carbs}</TableCell>
+                          <TableCell >{row.protein}</TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </Paper>
+            </Grid>
           </Grid>
-          <Grid item xs={4}></Grid>
-          <Grid item xs={1} >
-          <Link to="/pet">
-            <Fab color="primary" aria-label="Add" className={classes.fab}>
-              <AddIcon />
-            </Fab>
-          </Link>            
-          </Grid> 
-          <Grid item xs={1}>
-            <Fab variant="extended" aria-label="Delete" className={classes.fab}>
-              <NavigationIcon className={classes.extendedIcon}/>Filtro
-            </Fab>
-          </Grid>   
-          <Grid item xs={2}>
-          </Grid>              
-          <Grid item xs={12}>            
-            <Paper className={classes.root}>
-              <Table className={classes.table}>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Dessert (100g serving)</TableCell>
-                    <TableCell numeric>Calories</TableCell>
-                    <TableCell numeric>Fat (g)</TableCell>
-                    <TableCell numeric>Carbs (g)</TableCell>
-                    <TableCell numeric>Protein (g)</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {rows.map(row => {
-                    return (
-                      <TableRow key={row.id}>
-                        <TableCell component="th" scope="row">
-                          {row.name}
-                        </TableCell>
-                        <TableCell numeric>{row.calories}</TableCell>
-                        <TableCell numeric>{row.fat}</TableCell>
-                        <TableCell numeric>{row.carbs}</TableCell>
-                        <TableCell numeric>{row.protein}</TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </Paper>
-          </Grid>
-        </Grid>
-      </main>
-    </div>
-  );
+        </main>
+      </div>
+    );
+  }
 }
 
 Pets.propTypes = {

@@ -13,6 +13,7 @@ import TextField from '@material-ui/core/TextField'
 import deburr from 'lodash/deburr'
 import parse from 'autosuggest-highlight/umd/parse'
 import axios from 'axios'
+import { Link } from 'react-router-dom'
 import './pet.css'
 
 const styles = theme => ({
@@ -71,43 +72,7 @@ const styles = theme => ({
   },
 });
 
-const suggestions = [
-  { label: 'Afghanistan' },
-  { label: 'Aland Islands' },
-  { label: 'Albania' },
-  { label: 'Algeria' },
-  { label: 'American Samoa' },
-  { label: 'Andorra' },
-  { label: 'Angola' },
-  { label: 'Anguilla' },
-  { label: 'Antarctica' },
-  { label: 'Antigua and Barbuda' },
-  { label: 'Argentina' },
-  { label: 'Armenia' },
-  { label: 'Aruba' },
-  { label: 'Australia' },
-  { label: 'Austria' },
-  { label: 'Azerbaijan' },
-  { label: 'Bahamas' },
-  { label: 'Bahrain' },
-  { label: 'Bangladesh' },
-  { label: 'Barbados' },
-  { label: 'Belarus' },
-  { label: 'Belgium' },
-  { label: 'Belize' },
-  { label: 'Benin' },
-  { label: 'Bermuda' },
-  { label: 'Bhutan' },
-  { label: 'Bolivia, Plurinational State of' },
-  { label: 'Bonaire, Sint Eustatius and Saba' },
-  { label: 'Bosnia and Herzegovina' },
-  { label: 'Botswana' },
-  { label: 'Bouvet Island' },
-  { label: 'Brazil' },
-  { label: 'British Indian Ocean Territory' },
-  { label: 'Brunei Darussalam' },
-];
-
+const suggestions = []
 
 function renderInputComponent(inputProps) {
   const { classes, inputRef = () => { }, ref, ...other } = inputProps;
@@ -153,6 +118,7 @@ function renderSuggestion(suggestion, { query, isHighlighted }) {
 }
 
 function getSuggestions(value) {
+  console.log('value',value)
   const inputValue = deburr(value.trim()).toLowerCase();
   const inputLength = inputValue.length;
   let count = 0;
@@ -174,30 +140,48 @@ function getSuggestionValue(suggestion) {
   return suggestion.label;
 }
 
-
-
 class Pet extends React.Component {
-  state = {
-    single: '',
-    suggestions: [],
-    pet : {
-      nameClient : '',
-      name : '',
-      breed : '',
-      weight : 0,
-      height : 0,
-      typeOfAnimal : '',
-      observation : '',
-    }
-  };
 
+  constructor(props){
+    super(props);    
+    this.state = {
+      single: '',
+      suggestions: [],
+      pet: {
+        nameClient: '',
+        name: '',
+        breed: '',
+        weight: 0,
+        height: 0,
+        typeOfAnimal: '',
+        observation: '',
+      }
+    };
+  }  
+
+  clear() {
+    let pets = Object.assign({}, this.state.pet)
+    pets.name = ''
+    pets.nameClient = ''
+    pets.typeOfAnimal = ''
+    pets.weight = 0
+    pets.height = 0
+    pets.breed = ''
+    pets.observation = ''
+    this.setState((state) => ({pet: pets}))
+  }
+  
   componentDidMount() {
-  /*axios.get('http://localhost:4000/users/userClient')
-      .then(res => {        
-        console.log(res.data.rows)
-        const suggestions = res.data.rows
-        //this.setState({suggestions: res.data.rows })               
-      })*/
+    let clients;
+    axios.get('http://localhost:4000/users/userClient')
+      .then(res => {
+        clients = res.data.rows
+        clients.forEach(element => {
+          suggestions.push({label: element.name })
+        })
+      }).catch(err => {
+        console.log(err)
+      })
   }
 
   handleSuggestionsFetchRequested = ({ value }) => {
@@ -212,16 +196,21 @@ class Pet extends React.Component {
     });
   };
 
-  handleChangeComplet = name => (event, { newValue }) => {
-    this.setState({
-      [name]: newValue,
-    });
-  };
-
   handleChange = name => event => {
     let pet = Object.assign({}, this.state.pet)
     pet[name] = event.target.value
-    this.setState((state) => ({pet: pet}))
+    this.setState((state) => ({ pet: pet }))
+  }
+
+  save = () => {
+    let data = this.state.pet
+    axios.post(`http://localhost:4000/pets/save`, {data})
+      .then(data => {
+        console.log(data)
+        this.clear()
+      }).catch(err => {
+        console.log(err)
+    })
   }
 
 
@@ -236,7 +225,6 @@ class Pet extends React.Component {
       getSuggestionValue,
       renderSuggestion,
     };
-
     return (
       <div className={classes.rootHeader}>
         <Header />
@@ -257,8 +245,8 @@ class Pet extends React.Component {
                     inputProps={{
                       classes,
                       placeholder: 'Nome do Cliente',
-                      value: this.state.single,
-                      onChange: this.handleChangeComplet('single'),
+                      value: this.state.pet.nameClient,
+                      onChange: this.handleChange('nameClient'),
                     }}
                     theme={{
                       container: classes.container,
@@ -352,11 +340,16 @@ class Pet extends React.Component {
                 </div>
               </Grid>
               <Grid item xs={12}>
-                <Button variant="outlined" color="primary" className={classes.button}>
+                <Button variant="outlined" color="primary" 
+                  className={classes.button}
+                  onClick={this.save}
+                  >
                   Salvar
                 </Button>
 
-                <Button variant="outlined" color="secondary" className={classes.button}>
+                <Button variant="outlined" color="secondary" 
+                  className={classes.button}
+                  component={Link} to="/pets" >                
                   Voltar
                 </Button>
               </Grid>

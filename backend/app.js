@@ -3,7 +3,6 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-const controller = require('./controller/user.controller.js');
 //const verifySignUp = require('./routes/verifySignUp');
 
 const db = require('./config/db.config');
@@ -42,6 +41,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users',require('./controller/user.controller.js'));
+app.use('/pets', require('./controller/pet.controller.js'));
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
